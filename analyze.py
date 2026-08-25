@@ -1,8 +1,8 @@
 import json
 from collections import Counter
 
-with open("results_raw.json") as f:
-    results = json.load(f)
+with open("results.jsonl") as f:
+    results = [json.loads(line) for line in f]
 
 auth_counts = Counter()
 for r in results:
