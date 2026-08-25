@@ -1,0 +1,241 @@
+{
+  "dataset": {
+    "apps": 100,
+    "unique_apps": 100,
+    "categories": {
+      "CRM and Sales": 10,
+      "Support and Helpdesk": 10,
+      "Communications and Messaging": 10,
+      "Marketing, Ads, Email and Social": 10,
+      "Ecommerce": 10,
+      "Data, SEO and Scraping": 10,
+      "Developer, Infra and Data platforms": 10,
+      "Productivity and Project Management": 10,
+      "Finance and Fintech": 10,
+      "AI, Research and Media-native": 10
+    },
+    "validation": {
+      "duplicate_apps": 0,
+      "records_with_missing_required_fields": 0,
+      "failed_records": 0
+    }
+  },
+  "auth_distribution": {
+    "OAuth2": 68,
+    "JWT": 2,
+    "Private app access token": 1,
+    "API key": 75,
+    "Basic Auth": 4,
+    "API Key": 1,
+    "HTTP Basic": 2,
+    "App Access Token": 1,
+    "Bot token": 1,
+    "User access token": 1,
+    "OAuth 1.0a": 1,
+    "Bearer Token": 1,
+    "Bearer token": 3,
+    "Webhook": 1,
+    "Personal access tokens": 1,
+    "GitHub App tokens": 1,
+    "Personal access token": 2,
+    "Basic auth": 1,
+    "Key pair (JWT)": 1,
+    "Application key": 1,
+    "OpenID Connect": 1,
+    "Merchant ID / Connect ID / Password": 1,
+    "Client Certificate": 1
+  },
+  "self_serve": {
+    "self-serve": 87,
+    "gated": 13
+  },
+  "gate_reason": {
+    "none": 85,
+    "contact-sales": 6,
+    "admin approval": 4,
+    "paid plan": 5
+  },
+  "api_surface": {
+    "both": 10,
+    "REST": 85,
+    "GraphQL": 3,
+    "none": 2
+  },
+  "api_breadth": {
+    "broad": 91,
+    "narrow": 9
+  },
+  "mcp_exists": {
+    "true": 73,
+    "false": 27
+  },
+  "buildability": {
+    "yes": 90,
+    "partial": 10
+  },
+  "easy_wins": {
+    "self_serve_and_buildable": 85,
+    "self_serve_and_mcp": 66,
+    "gated_but_buildable": 5
+  },
+  "category_stats": {
+    "AI, Research and Media-native": {
+      "total": 10,
+      "self_serve": 7,
+      "gated": 3,
+      "mcp_exists": 7,
+      "buildability_yes": 8,
+      "buildability_partial": 2
+    },
+    "CRM and Sales": {
+      "total": 10,
+      "self_serve": 9,
+      "gated": 1,
+      "mcp_exists": 10,
+      "buildability_yes": 10,
+      "buildability_partial": 0
+    },
+    "Communications and Messaging": {
+      "total": 10,
+      "self_serve": 10,
+      "gated": 0,
+      "mcp_exists": 5,
+      "buildability_yes": 10,
+      "buildability_partial": 0
+    },
+    "Data, SEO and Scraping": {
+      "total": 10,
+      "self_serve": 9,
+      "gated": 1,
+      "mcp_exists": 7,
+      "buildability_yes": 8,
+      "buildability_partial": 2
+    },
+    "Developer, Infra and Data platforms": {
+      "total": 10,
+      "self_serve": 10,
+      "gated": 0,
+      "mcp_exists": 8,
+      "buildability_yes": 10,
+      "buildability_partial": 0
+    },
+    "Ecommerce": {
+      "total": 10,
+      "self_serve": 8,
+      "gated": 2,
+      "mcp_exists": 7,
+      "buildability_yes": 7,
+      "buildability_partial": 3
+    },
+    "Finance and Fintech": {
+      "total": 10,
+      "self_serve": 8,
+      "gated": 2,
+      "mcp_exists": 5,
+      "buildability_yes": 8,
+      "buildability_partial": 2
+    },
+    "Marketing, Ads, Email and Social": {
+      "total": 10,
+      "self_serve": 7,
+      "gated": 3,
+      "mcp_exists": 6,
+      "buildability_yes": 9,
+      "buildability_partial": 1
+    },
+    "Productivity and Project Management": {
+      "total": 10,
+      "self_serve": 10,
+      "gated": 0,
+      "mcp_exists": 10,
+      "buildability_yes": 10,
+      "buildability_partial": 0
+    },
+    "Support and Helpdesk": {
+      "total": 10,
+      "self_serve": 9,
+      "gated": 1,
+      "mcp_exists": 8,
+      "buildability_yes": 10,
+      "buildability_partial": 0
+    }
+  },
+  "blockers": [
+    {
+      "app": "LinkedIn Ads",
+      "category": "Marketing, Ads, Email and Social",
+      "blocker": "Requires approved Marketing Developer Platform (MDP) partnership and application review for full advertising and marketing API access.",
+      "gate_reason": "admin approval",
+      "buildability": "partial"
+    },
+    {
+      "app": "Salesforce Commerce Cloud",
+      "category": "Ecommerce",
+      "blocker": "Requires a paid enterprise Salesforce Commerce Cloud contract and gated environment provisioning for API/sandbox access.",
+      "gate_reason": "contact-sales",
+      "buildability": "partial"
+    },
+    {
+      "app": "Squarespace",
+      "category": "Ecommerce",
+      "blocker": "API access (such as Orders and Inventory APIs and Developer Platform) requires higher-tier paid plans like Commerce Advanced or Core plans.",
+      "gate_reason": "paid plan",
+      "buildability": "partial"
+    },
+    {
+      "app": "Amazon Selling Partner",
+      "category": "Ecommerce",
+      "blocker": "Requires a Professional selling account and manual developer profile approval from Amazon.",
+      "gate_reason": "admin approval",
+      "buildability": "partial"
+    },
+    {
+      "app": "Sherlock",
+      "category": "Data, SEO and Scraping",
+      "blocker": "No native REST or GraphQL API; can be used as a Python package dependency or via CLI.",
+      "gate_reason": "none",
+      "buildability": "partial"
+    },
+    {
+      "app": "Clay",
+      "category": "Data, SEO and Scraping",
+      "blocker": "No standalone public developer API for managing tables programmatically; integration relies on inbound webhooks and outbound HTTP API enrichments within paid workspace plans.",
+      "gate_reason": "paid plan",
+      "buildability": "partial"
+    },
+    {
+      "app": "Paygent Connect",
+      "category": "Finance and Fintech",
+      "blocker": "API documentation and modules require merchant contract, NDA agreement, and approval before access.",
+      "gate_reason": "contact-sales",
+      "buildability": "partial"
+    },
+    {
+      "app": "PitchBook",
+      "category": "Finance and Fintech",
+      "blocker": "Requires contacting sales and entering a paid enterprise contract for Direct Data / API access.",
+      "gate_reason": "contact-sales",
+      "buildability": "partial"
+    },
+    {
+      "app": "NotebookLM",
+      "category": "AI, Research and Media-native",
+      "blocker": "Official APIs are restricted to Gemini Notebook Enterprise on Google Cloud; consumer NotebookLM lacks a public developer API.",
+      "gate_reason": "paid plan",
+      "buildability": "partial"
+    },
+    {
+      "app": "Consensus",
+      "category": "AI, Research and Media-native",
+      "blocker": "API is available by application only with custom quotes and paid pricing tiers.",
+      "gate_reason": "contact-sales",
+      "buildability": "partial"
+    }
+  ],
+  "notes": [
+    "Percentages are calculated over the 100-app research set.",
+    "Authentication counts are non-exclusive because an app can expose multiple auth methods.",
+    "Categories come from the supplied apps CSV and are joined by app name; they were not inferred or changed.",
+    "The source records were not modified; deliverables were generated from the completed fixed research output."
+  ]
+}

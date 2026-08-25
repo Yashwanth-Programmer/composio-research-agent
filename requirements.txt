@@ -1,0 +1,4 @@
+composio
+composio-gemini
+google-genai
+python-dotenv
