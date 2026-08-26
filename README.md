@@ -20,37 +20,36 @@ https://github.com/Yashwanth-Programmer/composio-research-agent
 **Instructions To Run**
 
 1. Clone the repo
-git clone https://github.com/Yashwanth-Programmer/composio-research-agent.git
-cd composio-research-agent
+   git clone https://github.com/Yashwanth-Programmer/composio-research-agent.git
+   cd composio-research-agent
 
 2. Create a virtual environment
-
-Windows
-python -m venv venv
-venv\Scripts\activate
-
-macOS/Linux
-python3 -m venv venv
-source venv/bin/activate
+   Windows
+   python -m venv venv
+   venv\Scripts\activate
+   
+   macOS/Linux
+   python3 -m venv venv
+   source venv/bin/activate
 
 3. Install dependencies
-pip install -r requirements.txt
-Our runner uses python-dotenv, the Composio SDK/Gemini provider, and the Google GenAI SDK.
+   pip install -r requirements.txt
+   Our runner uses python-dotenv, the Composio SDK/Gemini provider, and the Google GenAI SDK.
 
 4. Create .env
-Create .env in the same folder as run_batch.py:
-Put:
-COMPOSIO_API_KEY=your_composio_api_key
-GEMINI_API_KEY=your_gemini_api_key
+   Create .env in the same folder as run_batch.py:
+   Put:
+   COMPOSIO_API_KEY=your_composio_api_key
+   GEMINI_API_KEY=your_gemini_api_key
 
-5. Run the research agent
-   python run_batch.py 
+5. The repository includes a completed `results.jsonl` dataset for inspection.
 
-7. View the existing completed results clear and run it
-   The repository already contains the completed research output:
+   The batch runner is resumable and skips apps already present in `results.jsonl`.  
+## For a fresh run from all 100 apps, first empty: then run python python run_batch.py
+   Note: Do not delete `results.jsonl`; remove it only when reproducing the research run from scratch.
+   
+   ```bash
    results.jsonl
-
-run python analyze.py for patterns in json format
 
 # How Composio Was Used
 
