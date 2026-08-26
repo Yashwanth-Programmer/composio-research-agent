@@ -689,13 +689,203 @@ footer{padding:44px 0 70px;}
   </div>
 </section>
 
+
+<section id="methodology">
+  <div class="wrap">
+    <div class="eyebrow">04 — Methodology &amp; product ops</div>
+    <h2 class="sec-title">Two rerun paths: reliability recovery + MCP verification</h2>
+    <p class="sec-desc">
+      The workflow does not treat every bad result the same way. The rerun layer first recovers failed or incomplete
+      research records, then runs a separate targeted verification pass for MCP=false candidates. This keeps recovery
+      costs focused and makes the source of each correction explicit.
+    </p>
+
+    <div class="pipeline">
+      <div class="pstep">
+        <div class="pn">1</div>
+        <div class="pc">
+          <div class="pt">Pass 1 — batch research</div>
+          <div class="pd">
+            <code>run_batch.py</code> researches the 100 apps with Gemini + Composio Search and persists one JSON object
+            per app into <code>results.jsonl</code>.
+          </div>
+        </div>
+      </div>
+
+      <div class="pstep">
+        <div class="pn">2</div>
+        <div class="pc">
+          <div class="pt">Rerun A — failed-record recovery</div>
+          <div class="pd">
+            The rerun reads the existing JSONL and looks for records that are incomplete or failed. It specifically
+            handles <code>PARSE_FAILED</code>, <code>FAILED_ALL_RETRIES</code>, and <code>MAX_TURNS_EXCEEDED</code>.
+            Only those records are re-researched instead of repeating the full 100-app run.
+          </div>
+        </div>
+      </div>
+
+      <div class="pstep">
+        <div class="pn">3</div>
+        <div class="pc">
+          <div class="pt">Rerun B — MCP verification</div>
+          <div class="pd">
+            Separately, every valid record with <code>mcp_exists: false</code> is treated as an MCP verification
+            candidate. The second pass adds GitHub + search evidence to catch community or third-party MCP servers
+            missed by the first pass.
+          </div>
+        </div>
+      </div>
+
+      <div class="pstep">
+        <div class="pn">4</div>
+        <div class="pc">
+          <div class="pt">Evidence-backed correction</div>
+          <div class="pd">
+            A successful MCP correction changes <code>mcp_exists</code> to <code>true</code> and persists
+            <code>mcp_evidence_url</code> plus <code>mcp_notes</code>. This makes the correction auditable rather
+            than silently overwriting the original classification.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-stats" style="margin-top:28px;">
+      <div class="hero-stat">
+        <div class="num">3</div>
+        <div class="label">failure classes recovered</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">27</div>
+        <div class="label">MCP=false candidates</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">21/27</div>
+        <div class="label">MCP evidence found</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">6/27</div>
+        <div class="label">remained no-MCP</div>
+      </div>
+    </div>
+
+    <div style="margin-top:26px;padding:18px;border:1px solid var(--hairline);background:var(--paper-raised);font-family:var(--mono);font-size:12px;line-height:1.75;color:var(--ink-soft);">
+      <b style="color:var(--ink);">Product-ops takeaway:</b>
+      reliability failures and research-quality false negatives require different recovery strategies.
+      The first rerun protects pipeline completion; the second improves MCP recall only where the first pass
+      is most likely to be incomplete.
+    </div>
+  </div>
+</section>
+
+
+<section id="reliability">
+  <div class="wrap">
+    <div class="eyebrow">05 — Reliability &amp; human oversight</div>
+    <h2 class="sec-title">Failures were recoverable — and watched by a human</h2>
+    <p class="sec-desc">
+      The rerun was not only for MCP. The pipeline first recovered records that failed at the execution or
+      parsing layer, then separately ran the MCP verification pass. This keeps reliability issues and research
+      quality issues distinct.
+    </p>
+
+    <div class="ledger" style="margin-top:26px;">
+      <div class="ledger-head">
+        <span class="tag">FAILED_NOTES — highlighted recovery classes</span>
+        <span style="color:var(--ink-soft);font-size:11px;">rerun only what failed</span>
+      </div>
+
+      <div style="padding:18px;border-bottom:1px solid var(--hairline);font-family:var(--mono);font-size:12px;line-height:1.8;">
+        <div><b style="color:var(--ink);">PARSE_FAILED</b> — model returned malformed / non-JSON output.</div>
+        <div><b style="color:var(--ink);">FAILED_ALL_RETRIES</b> — the app still failed after retry attempts.</div>
+        <div><b style="color:var(--ink);">MAX_TURNS_EXCEEDED</b> — the tool/model loop did not finish within the allowed turn budget.</div>
+      </div>
+
+      <div class="ledger-row">
+        <div class="ledger-app">Example recovery A</div>
+        <div class="ledger-diff">
+          <span class="diff-old">PARSE_FAILED</span>
+          <span class="diff-arrow">→</span>
+          <span class="diff-new">rerun → valid JSON</span>
+        </div>
+        <div class="ledger-cause">The first response could not be parsed into the required schema. The failed-record rerun re-researched the same app and replaced the failed record with a structured result.</div>
+      </div>
+
+      <div class="ledger-row">
+        <div class="ledger-app">Example recovery B</div>
+        <div class="ledger-diff">
+          <span class="diff-old">FAILED_ALL_RETRIES</span>
+          <span class="diff-arrow">→</span>
+          <span class="diff-new">rerun → completed record</span>
+        </div>
+        <div class="ledger-cause">The app exhausted its retry budget during the first pass. The rerun picked up the failed record only, instead of spending calls on the other completed apps.</div>
+      </div>
+    </div>
+
+    <div class="hero-stats" style="margin-top:28px;">
+      <div class="hero-stat">
+        <div class="num">3</div><div class="label">failure classes</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">100</div><div class="label">apps resumable</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">5s</div><div class="label">intentional inter-app delay</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">180s</div><div class="label">per-app timeout</div>
+      </div>
+    </div>
+
+    <div style="margin-top:24px;padding:18px;border:1px solid var(--hairline);background:var(--paper-raised);font-family:var(--mono);font-size:12px;line-height:1.8;color:var(--ink-soft);">
+      <b style="color:var(--ink);">Human intervention:</b>
+      the human role was not to manually rewrite every app. It included watching the free-tier budget and
+      optimization strategy, keeping the 5-second pacing, avoiding unnecessary full reruns, and deciding when
+      a targeted verification pass was worth the extra model/tool calls. A small sample of results was also
+      checked against live documentation, and the resulting records were then spot-checked with additional LLM
+      review; the checks were broadly consistent with the saved dataset.
+    </div>
+  </div>
+</section>
+
+
+<section id="stats-validation">
+  <div class="wrap">
+    <div class="eyebrow">06 — Stats validation</div>
+    <h2 class="sec-title">The aggregate stats were spot-checked before I trusted the story</h2>
+    <p class="sec-desc">
+      The headline statistics shown in this case study are generated from the saved structured dataset.
+      I manually checked a small sample of roughly 6–10 apps against their live documentation, then used
+      multiple LLM reviews as an additional consistency check. The independent checks were broadly consistent
+      with the generated fields and patterns, with no obvious systematic issue found in the sampled records.
+    </p>
+
+    <div class="accuracy-line">
+      <div class="stage">6–10 apps · live docs checked</div>
+      <div class="arrow">→</div>
+      <div class="stage p2">LLM cross-check · broadly consistent</div>
+    </div>
+
+    <div style="margin-top:24px;padding:18px;border:1px solid var(--hairline);background:var(--paper-raised);font-family:var(--mono);font-size:12px;line-height:1.8;color:var(--ink-soft);">
+      <b style="color:var(--ink);">What I checked:</b>
+      API/auth details, access/gating, API surface, MCP status, and the generated aggregate patterns were
+      compared against live documentation for the sampled apps. The LLM review was used as a second opinion,
+      not as the sole source of truth.
+    </div>
+
+    <p style="font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-top:16px;">
+      <b style="color:var(--ink);">Scope note:</b>
+      this was a spot-check rather than a full 100-row manual audit, so the result supports confidence in the
+      sampled data and generated patterns but should not be described as proof of 100% row-level accuracy.
+    </p>
+  </div>
+</section>
+
 <footer>
   <div class="wrap">
     <div class="eyebrow">05 — Links</div>
     <div class="foot-links">
-      <a <a href="https://github.com/Yashwanth-Programmer/composio-research-agent" id="repo-link" target="_blank" rel="noopener">GitHub Repo →</a>
+      <a href="https://github.com/Yashwanth-Programmer/composio-research-agent" id="repo-link" target="_blank" rel="noopener">GitHub Repo →</a>
     </div>
-    <p class="foot-note">Replace the two placeholder links above before submitting — point them at your pushed repo and your Vercel/Netlify/GH Pages deploy of this file.</p>
   </div>
 </footer>
 
