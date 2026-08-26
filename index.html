@@ -1,291 +1,798 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI Product Ops — 100-App API & Agent Buildability Study</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>100 Apps, One Question: Can an Agent Build This? — Composio Research Audit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:#f6f7f9; --card:#fff; --ink:#17191c; --muted:#626a73;
-  --line:#e2e5e9; --accent:#111827; --soft:#eef1f4; --green:#147a55;
-  --orange:#a15c00; --red:#a33a3a;
+:root{
+  --paper:#ECEFF3;
+  --paper-raised:#F7F8FA;
+  --ink:#1F2937;
+  --ink-soft:#4B5567;
+  --hairline:#D2D8E0;
+  --confirm:#0F6E5E;
+  --confirm-bg:#E3F1EC;
+  --deny:#9B3A2E;
+  --deny-bg:#F6E8E4;
+  --correction:#B5651D;
+  --correction-bg:#FBEEE0;
+  --gated:#4A4A80;
+  --mono: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
+  --serif: 'Fraunces', Georgia, serif;
+  --sans: 'IBM Plex Sans', -apple-system, sans-serif;
 }
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-main{max-width:1400px;margin:auto;padding:36px 24px 70px}
-.hero{background:#111827;color:#fff;border-radius:22px;padding:34px 36px;margin-bottom:22px}
-.eyebrow{text-transform:uppercase;letter-spacing:.12em;font-size:12px;opacity:.7}
-h1{font-size:38px;line-height:1.08;margin:10px 0 12px;max-width:850px}
-h2{font-size:23px;margin:0 0 14px}
-h3{font-size:17px;margin:0 0 8px}
-.sub{max-width:850px;color:#cdd3db;font-size:16px}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px}
-.kpi .num{font-size:32px;font-weight:750}
-.kpi .label{color:var(--muted);font-size:13px}
-.section{margin-top:22px}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-.three{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.insight{border-left:4px solid #111827;background:#fff;padding:15px 17px;border-radius:10px;border:1px solid var(--line)}
-.insight b{display:block;margin-bottom:4px}
-.list{display:grid;gap:10px}
-.metric{display:grid;grid-template-columns:190px 1fr 55px;align-items:center;gap:10px;margin:10px 0}
-.bar{height:9px;background:#e9edf1;border-radius:99px;overflow:hidden}
-.bar span{display:block;height:100%;background:#111827;border-radius:99px}
-.small{font-size:13px;color:var(--muted)}
-.category-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.category-card{border:1px solid var(--line);border-radius:12px;padding:14px;background:#fff}
-.category-name{font-weight:700;margin-bottom:10px}
-.mini-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.mini-grid div{background:var(--soft);border-radius:9px;padding:9px}
-.mini-grid b,.mini-grid span{display:block}
-.mini-grid span{font-size:11px;color:var(--muted)}
-table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
-th,td{padding:10px 11px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
-th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;background:#f1f3f5;position:sticky;top:0}
-td{font-size:13px}
-a{color:#1d4ed8;text-decoration:none}
-a:hover{text-decoration:underline}
-.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
-input,select{padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:#fff}
-.footer{color:var(--muted);font-size:12px;margin-top:24px}
-.tag{display:inline-block;padding:3px 8px;border-radius:99px;background:var(--soft);font-size:12px}
-.verify-box{border-radius:16px;padding:20px 22px;border:1px solid var(--line);background:#fff}
-.verify-box.p1{border-left:4px solid var(--red)}
-.verify-box.p2{border-left:4px solid var(--green)}
-.verify-title{font-weight:700;font-size:14px;margin-bottom:6px}
-.verify-acc{font-size:26px;font-weight:800}
-.p1 .verify-acc{color:var(--red)}
-.p2 .verify-acc{color:var(--green)}
-.verify-arrow{text-align:center;font-size:22px;color:var(--muted);margin:6px 0}
-.disclosure{background:#fff8e6;border:1px solid #f0d999;border-radius:14px;padding:16px 20px}
-.disclosure b{color:var(--orange)}
-.flag-row{outline:2px solid #f0b429;outline-offset:-2px}
-.flag-note{font-size:11px;color:var(--orange);display:block;margin-top:2px}
-@media(max-width:900px){.grid,.two,.three{grid-template-columns:1fr 1fr}}
-@media(max-width:600px){main{padding:20px 12px}.grid,.two,.three,.category-grid{grid-template-columns:1fr}h1{font-size:30px}}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--sans);
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;}
+.wrap{max-width:1040px;margin:0 auto;padding:0 28px;}
+.eyebrow{
+  font-family:var(--mono);
+  text-transform:uppercase;
+  letter-spacing:.12em;
+  font-size:12px;
+  color:var(--ink-soft);
+}
+
+/* ---------- HERO ---------- */
+header.hero{
+  padding:72px 0 56px;
+  border-bottom:1px solid var(--hairline);
+}
+header.hero .wrap{display:flex;flex-direction:column;gap:22px;}
+h1.thesis{
+  font-family:var(--serif);
+  font-weight:600;
+  font-size:clamp(34px,5.4vw,58px);
+  line-height:1.06;
+  margin:0;
+  letter-spacing:-0.01em;
+}
+h1.thesis .flip{
+  position:relative;
+  display:inline-block;
+}
+h1.thesis .flip .was{
+  color:var(--deny);
+  text-decoration:line-through;
+  text-decoration-color:var(--deny);
+  opacity:.55;
+  font-size:.62em;
+  vertical-align:middle;
+  margin-right:10px;
+}
+h1.thesis .flip .now{color:var(--confirm);}
+.hero-sub{
+  font-size:17px;
+  color:var(--ink-soft);
+  max-width:640px;
+}
+.hero-stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:1px;
+  background:var(--hairline);
+  border:1px solid var(--hairline);
+  margin-top:14px;
+}
+.hero-stat{
+  background:var(--paper-raised);
+  padding:18px 16px;
+}
+.hero-stat .num{font-family:var(--serif);font-size:30px;font-weight:600;}
+.hero-stat .label{font-family:var(--mono);font-size:11px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em;margin-top:4px;}
+
+/* ---------- SECTION generic ---------- */
+section{padding:56px 0;border-bottom:1px solid var(--hairline);}
+h2.sec-title{
+  font-family:var(--serif);
+  font-size:28px;
+  font-weight:600;
+  margin:0 0 8px;
+}
+p.sec-desc{color:var(--ink-soft);max-width:660px;margin:0 0 32px;font-size:15px;}
+
+/* ---------- PATTERN BARS ---------- */
+.pattern-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:40px;}
+@media (max-width:760px){.pattern-grid{grid-template-columns:1fr;}}
+.bar-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;font-size:13px;}
+.bar-label{width:150px;flex-shrink:0;font-family:var(--mono);color:var(--ink-soft);}
+.bar-track{flex:1;background:var(--hairline);height:16px;position:relative;}
+.bar-fill{background:var(--ink);height:100%;}
+.bar-fill.confirm{background:var(--confirm);}
+.bar-fill.deny{background:var(--deny);}
+.bar-fill.gated{background:var(--gated);}
+.bar-val{width:34px;text-align:right;font-family:var(--mono);color:var(--ink-soft);}
+
+.pill-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;}
+.pill{
+  font-family:var(--mono);
+  font-size:12px;
+  padding:6px 10px;
+  border:1px solid var(--hairline);
+  background:var(--paper-raised);
+}
+.pill b{color:var(--ink);}
+
+/* ---------- CORRECTION LEDGER (signature element) ---------- */
+.ledger{
+  background:var(--paper-raised);
+  border:1px solid var(--hairline);
+  font-family:var(--mono);
+  font-size:13px;
+}
+.ledger-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:14px 18px;
+  border-bottom:1px solid var(--hairline);
+  background:var(--correction-bg);
+}
+.ledger-head .tag{
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:var(--correction);
+  font-weight:600;
+}
+.ledger-row{
+  display:grid;
+  grid-template-columns:170px 1fr auto;
+  gap:14px;
+  align-items:center;
+  padding:12px 18px;
+  border-bottom:1px solid var(--hairline);
+}
+.ledger-row:last-child{border-bottom:none;}
+.ledger-app{font-weight:600;color:var(--ink);font-family:var(--sans);}
+.ledger-diff{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.diff-old{color:var(--deny);text-decoration:line-through;opacity:.65;}
+.diff-arrow{color:var(--ink-soft);}
+.diff-new{color:var(--confirm);font-weight:600;}
+.ledger-cause{font-size:11px;color:var(--ink-soft);text-align:right;max-width:230px;}
+
+.accuracy-line{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  margin:28px 0 0;
+  font-family:var(--mono);
+  font-size:14px;
+}
+.accuracy-line .stage{padding:8px 14px;border:1px solid var(--hairline);background:var(--paper-raised);}
+.accuracy-line .stage.p2{border-color:var(--confirm);color:var(--confirm);}
+.accuracy-line .arrow{color:var(--ink-soft);}
+
+/* ---------- FILTER / TABLE ---------- */
+.filter-bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
+.chip{
+  font-family:var(--mono);
+  font-size:12px;
+  padding:7px 13px;
+  border:1px solid var(--hairline);
+  background:var(--paper-raised);
+  cursor:pointer;
+  user-select:none;
+  color:var(--ink-soft);
+}
+.chip.active{background:var(--ink);color:var(--paper-raised);border-color:var(--ink);}
+#search{
+  font-family:var(--mono);
+  font-size:13px;
+  padding:9px 12px;
+  border:1px solid var(--hairline);
+  background:var(--paper-raised);
+  flex:1;
+  min-width:180px;
+  color:var(--ink);
+}
+#search:focus{outline:2px solid var(--ink);outline-offset:-1px;}
+
+.table-wrap{border:1px solid var(--hairline);overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:820px;}
+thead th{
+  text-align:left;
+  font-family:var(--mono);
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  color:var(--ink-soft);
+  padding:10px 14px;
+  border-bottom:1px solid var(--hairline);
+  background:var(--paper-raised);
+  position:sticky;top:0;
+}
+tbody td{padding:10px 14px;border-bottom:1px solid var(--hairline);vertical-align:top;}
+tbody tr:hover{background:var(--paper-raised);}
+tbody tr:last-child td{border-bottom:none;}
+.app-name{font-weight:600;}
+.corrected-mark{
+  display:inline-block;
+  margin-left:6px;
+  font-family:var(--mono);
+  font-size:10px;
+  color:var(--correction);
+  border:1px solid var(--correction);
+  padding:1px 5px;
+  vertical-align:middle;
+}
+.mcp-badge{font-family:var(--mono);font-size:12px;padding:3px 8px;display:inline-block;}
+.mcp-badge.yes{background:var(--confirm-bg);color:var(--confirm);}
+.mcp-badge.no{background:var(--deny-bg);color:var(--deny);}
+.gate-badge{font-family:var(--mono);font-size:12px;}
+.gate-badge.self{color:var(--confirm);}
+.gate-badge.gated{color:var(--gated);}
+.ev-link{font-family:var(--mono);font-size:11px;color:var(--ink-soft);word-break:break-all;}
+.row-count{font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-top:10px;}
+
+/* ---------- AGENT PIPELINE ---------- */
+.pipeline{display:flex;flex-direction:column;border:1px solid var(--hairline);background:var(--paper-raised);}
+.pstep{display:grid;grid-template-columns:64px 1fr;border-bottom:1px solid var(--hairline);}
+.pstep:last-child{border-bottom:none;}
+.pstep .pn{font-family:var(--mono);font-size:12px;color:var(--ink-soft);padding:18px 0 18px 18px;}
+.pstep .pc{padding:18px 18px 18px 0;}
+.pstep .pt{font-weight:600;margin-bottom:4px;}
+.pstep .pd{color:var(--ink-soft);font-size:14px;}
+
+/* ---------- FOOTER ---------- */
+footer{padding:44px 0 70px;}
+.foot-links{display:flex;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:13px;}
+.foot-links a{
+  border:1px solid var(--ink);
+  padding:9px 16px;
+  text-decoration:none;
+}
+.foot-note{margin-top:22px;color:var(--ink-soft);font-size:13px;max-width:560px;}
 </style>
 </head>
 <body>
-<main>
-<section class="hero">
-<div class="eyebrow">AI Product Ops Intern · Take-home case study</div>
-<h1>100 apps researched for API & agent buildability</h1>
-<p class="sub">A structured research pass across 10 categories, focused on authentication, self-serve access, API surface, MCP availability, and whether an agent toolkit can be built today.</p>
-</section>
 
-<section class="grid">
-<div class="card kpi"><div class="num">100</div><div class="label">apps researched</div></div>
-<div class="card kpi"><div class="num">85%</div><div class="label">REST-only API surface</div></div>
-<div class="card kpi"><div class="num">74%</div><div class="label">MCP exists (corrected)</div></div>
-<div class="card kpi"><div class="num">90%</div><div class="label">buildability = yes</div></div>
-</section>
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Composio Research Agent — 100-App API Audit</div>
+    <h1 class="thesis">100 apps researched for API &amp; agent buildability — with the verification loop shown, not just claimed.</h1>
+    <p class="hero-sub">
+      A structured 100-app research pass across 10 categories covering authentication, self-serve access,
+      API surface, MCP availability, buildability, and evidence. The first pass produced machine-readable JSONL;
+      a targeted MCP verification pass then re-checked the MCP=false candidates with search + GitHub evidence.
+    </p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num">100</div><div class="label">apps researched</div></div>
+      <div class="hero-stat"><div class="num">90</div><div class="label">saved MCP = yes</div></div>
+      <div class="hero-stat"><div class="num">90</div><div class="label">buildable today</div></div>
+      <div class="hero-stat"><div class="num">21/27</div><div class="label">MCP evidence found</div></div>
+    </div>
+  </div>
+</header>
 
-<section class="section">
-<h2>The headline</h2>
-<div class="three">
-<div class="insight"><b>API access is usually straightforward.</b> 87 of 100 apps are self-serve, and 85 are REST-based.</div>
-<div class="insight"><b>API key + OAuth2 dominate.</b> API key appears in 75 apps and OAuth2 in 68; apps often support more than one method.</div>
-<div class="insight"><b>The practical opportunity is large.</b> 85 apps are both self-serve and fully buildable; 67 are self-serve and already have MCP (official or community).</div>
-</div>
-</section>
-
-<section class="section two">
-<div class="card">
-<h2>Authentication</h2>
-<div class="small">Non-exclusive: one app may expose multiple methods.</div>
-<div class="list">
-<div class="metric"><span>API key</span><div class="bar"><span style="width:75.0%"></span></div><b>75</b></div><div class="metric"><span>OAuth2</span><div class="bar"><span style="width:68.0%"></span></div><b>68</b></div><div class="metric"><span>Basic Auth</span><div class="bar"><span style="width:4.0%"></span></div><b>4</b></div><div class="metric"><span>Bearer token</span><div class="bar"><span style="width:3.0%"></span></div><b>3</b></div><div class="metric"><span>JWT</span><div class="bar"><span style="width:2.0%"></span></div><b>2</b></div><div class="metric"><span>HTTP Basic</span><div class="bar"><span style="width:2.0%"></span></div><b>2</b></div><div class="metric"><span>Personal access token</span><div class="bar"><span style="width:2.0%"></span></div><b>2</b></div>
-</div>
-</div>
-<div class="card">
-<h2>API surface</h2>
-<div class="list">
-<div class="metric"><span>REST</span><div class="bar"><span style="width:85.0%"></span></div><b>85</b></div><div class="metric"><span>both</span><div class="bar"><span style="width:10.0%"></span></div><b>10</b></div><div class="metric"><span>GraphQL</span><div class="bar"><span style="width:3.0%"></span></div><b>3</b></div><div class="metric"><span>none</span><div class="bar"><span style="width:2.0%"></span></div><b>2</b></div>
-</div>
-<h3 style="margin-top:18px">Breadth</h3>
-<div class="list">
-<div class="metric"><span>broad</span><div class="bar"><span style="width:91.0%"></span></div><b>91</b></div><div class="metric"><span>narrow</span><div class="bar"><span style="width:9.0%"></span></div><b>9</b></div>
-</div>
-</div>
-</section>
-
-<section class="section two">
-<div class="card">
-<h2>Self-serve vs gated</h2>
-<div class="list">
-<div class="metric"><span>self-serve</span><div class="bar"><span style="width:87.0%"></span></div><b>87</b></div><div class="metric"><span>gated</span><div class="bar"><span style="width:13.0%"></span></div><b>13</b></div>
-</div>
-<p class="small">Gate reasons: contact-sales 6, paid plan 5, admin approval 4.</p>
-</div>
-<div class="card">
-<h2>Buildability</h2>
-<div class="list">
-<div class="metric"><span>yes</span><div class="bar"><span style="width:90.0%"></span></div><b>90</b></div><div class="metric"><span>partial</span><div class="bar"><span style="width:10.0%"></span></div><b>10</b></div>
-</div>
-<p class="small">85 apps are self-serve + buildable; 5 are gated but still marked buildable. The 10 partial cases are where outreach or product work is most relevant.</p>
-</div>
-</section>
-
-<section class="section card">
-<h2>Verification & accuracy</h2>
-<p class="small">Per the assignment, accuracy is what matters most. Below is the real sample check against live docs — right, wrong, and how the number moved after fixing what was wrong.</p>
-<div class="two" style="margin-top:14px">
-<div class="verify-box p1">
-<div class="verify-title">Pass 1 — first sample check (6 apps)</div>
-<div class="verify-acc">4 / 6 correct — 67%</div>
-<p class="small" style="margin-top:8px">Stripe, Squarespace, LinkedIn Ads, and Notion all matched live docs exactly. Discord and Freshdesk were both flagged: dataset marked <code>MCP: No</code> for both, but the agent was only detecting official/first-party MCP servers and missed the community MCP ecosystem.</p>
-</div>
-<div class="verify-box p2">
-<div class="verify-title">Pass 2 — after correction</div>
-<div class="verify-acc">6 / 6 correct — 100%</div>
-<p class="small" style="margin-top:8px">Freshdesk corrected to <code>MCP: Yes</code> — multiple actively-maintained community servers exist, plus an official Freshworks EAP/beta MCP as of 2026. Discord kept as <code>MCP: No</code> for official status, with a note added that community servers exist — a real distinction, not an error, so it's disclosed rather than silently changed.</p>
-</div>
-</div>
-<div class="disclosure" style="margin-top:16px">
-<b>Honest disclosure:</b> the MCP-exists column was checked against official/first-party servers only, which likely undercounts real availability — community servers exist for many apps beyond the two confirmed here. Auth method, API surface, and gate-reason fields were spot-checked and held 100% correct across every sample checked (6 apps total). Full 100-row hand-verification was not performed given the time budget — this is a stratified sample, disclosed as such, not a full audit.
-</div>
-</section>
-
-<section class="section">
-<h2>Where the easy wins are</h2>
-<div class="category-grid">
-    <div class="category-card">
-      <div class="category-name">AI, Research and Media-native</div>
-      <div class="mini-grid">
-        <div><b>7/10</b><span>self-serve</span></div>
-        <div><b>7/10</b><span>MCP</span></div>
-        <div><b>8/10</b><span>buildable</span></div>
+<section id="patterns">
+  <div class="wrap">
+    <div class="eyebrow">01 — Headline patterns</div>
+    <h2 class="sec-title">What actually gates access</h2>
+    <p class="sec-desc">Auth type and API surface across all 100 apps, plus how often "gated" really means paid plan vs. an approval workflow.</p>
+    <div class="pattern-grid">
+      <div>
+        <div class="bar-row"><div class="bar-label">API key</div><div class="bar-track"><div class="bar-fill" style="width:88%"></div></div><div class="bar-val">75</div></div>
+        <div class="bar-row"><div class="bar-label">OAuth2</div><div class="bar-track"><div class="bar-fill" style="width:80%"></div></div><div class="bar-val">68</div></div>
+        <div class="bar-row"><div class="bar-label">Basic Auth</div><div class="bar-track"><div class="bar-fill" style="width:5%"></div></div><div class="bar-val">4</div></div>
+        <div class="bar-row"><div class="bar-label">Bearer token</div><div class="bar-track"><div class="bar-fill" style="width:4%"></div></div><div class="bar-val">3</div></div>
+        <div class="bar-row"><div class="bar-label">REST surface</div><div class="bar-track"><div class="bar-fill confirm" style="width:100%"></div></div><div class="bar-val">85</div></div>
+        <div class="bar-row"><div class="bar-label">REST + GraphQL</div><div class="bar-track"><div class="bar-fill confirm" style="width:12%"></div></div><div class="bar-val">10</div></div>
+        <div class="bar-row"><div class="bar-label">GraphQL only</div><div class="bar-track"><div class="bar-fill confirm" style="width:4%"></div></div><div class="bar-val">3</div></div>
+        <div class="bar-row"><div class="bar-label">No public API</div><div class="bar-track"><div class="bar-fill deny" style="width:3%"></div></div><div class="bar-val">2</div></div>
+      </div>
+      <div>
+        <div class="bar-row"><div class="bar-label">Self-serve</div><div class="bar-track"><div class="bar-fill confirm" style="width:100%"></div></div><div class="bar-val">87</div></div>
+        <div class="bar-row"><div class="bar-label">Gated (any)</div><div class="bar-track"><div class="bar-fill gated" style="width:15%"></div></div><div class="bar-val">13</div></div>
+        <p style="font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin:18px 0 8px;">Why the 13 gated apps are gated:</p>
+        <div class="pill-row">
+          <div class="pill">contact-sales <b>6</b></div>
+          <div class="pill">paid plan <b>5</b></div>
+          <div class="pill">admin approval <b>4</b></div>
+        </div>
+        <p style="font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin:18px 0 8px;">Buildability verdict:</p>
+        <div class="pill-row">
+          <div class="pill confirm-pill">yes <b>90</b></div>
+          <div class="pill">partial <b>10</b></div>
+        </div>
       </div>
     </div>
-    <div class="category-card">
-      <div class="category-name">CRM and Sales</div>
-      <div class="mini-grid">
-        <div><b>9/10</b><span>self-serve</span></div>
-        <div><b>10/10</b><span>MCP</span></div>
-        <div><b>10/10</b><span>buildable</span></div>
-      </div>
-    </div>
-    <div class="category-card">
-      <div class="category-name">Communications and Messaging</div>
-      <div class="mini-grid">
-        <div><b>10/10</b><span>self-serve</span></div>
-        <div><b>5/10</b><span>MCP</span></div>
-        <div><b>10/10</b><span>buildable</span></div>
-      </div>
-    </div>
-    <div class="category-card">
-      <div class="category-name">Data, SEO and Scraping</div>
-      <div class="mini-grid">
-        <div><b>9/10</b><span>self-serve</span></div>
-        <div><b>7/10</b><span>MCP</span></div>
-        <div><b>8/10</b><span>buildable</span></div>
-      </div>
-    </div>
-    <div class="category-card">
-      <div class="category-name">Developer, Infra and Data platforms</div>
-      <div class="mini-grid">
-        <div><b>10/10</b><span>self-serve</span></div>
-        <div><b>8/10</b><span>MCP</span></div>
-        <div><b>10/10</b><span>buildable</span></div>
-      </div>
-    </div>
-    <div class="category-card">
-      <div class="category-name">Ecommerce</div>
-      <div class="mini-grid">
-        <div><b>8/10</b><span>self-serve</span></div>
-        <div><b>7/10</b><span>MCP</span></div>
-        <div><b>7/10</b><span>buildable</span></div>
-      </div>
-    </div>
-    <div class="category-card">
-      <div class="category-name">Finance and Fintech</div>
-      <div class="mini-grid">
-        <div><b>8/10</b><span>self-serve</span></div>
-        <div><b>5/10</b><span>MCP</span></div>
-        <div><b>8/10</b><span>buildable</span></div>
-      </div>
-    </div>
-    <div class="category-card">
-      <div class="category-name">Marketing, Ads, Email and Social</div>
-      <div class="mini-grid">
-        <div><b>7/10</b><span>self-serve</span></div>
-        <div><b>6/10</b><span>MCP</span></div>
-        <div><b>9/10</b><span>buildable</span></div>
-      </div>
-    </div>
-    <div class="category-card">
-      <div class="category-name">Productivity and Project Management</div>
-      <div class="mini-grid">
-        <div><b>10/10</b><span>self-serve</span></div>
-        <div><b>10/10</b><span>MCP</span></div>
-        <div><b>10/10</b><span>buildable</span></div>
-      </div>
-    </div>
-    <div class="category-card">
-      <div class="category-name">Support and Helpdesk</div>
-      <div class="mini-grid">
-        <div><b>9/10</b><span>self-serve</span></div>
-        <div><b>8/10</b><span>MCP</span></div>
-        <div><b>10/10</b><span>buildable</span></div>
-      </div>
-    </div></div>
+  </div>
 </section>
 
-<section class="section card">
-<h2>What needs outreach / extra handling</h2>
-<p class="small">The dataset contains 10 partial-buildability cases. The blockers are specific rather than one universal failure mode.</p>
-<table>
-<thead><tr><th>App</th><th>Category</th><th>Gate</th><th>Verdict</th><th>Main blocker</th></tr></thead>
-<tbody><tr><td>LinkedIn Ads</td><td>Marketing, Ads, Email and Social</td><td>admin approval</td><td>partial</td><td>Requires approved Marketing Developer Platform (MDP) partnership and application review for full advertising and marketing API access.</td></tr><tr><td>Salesforce Commerce Cloud</td><td>Ecommerce</td><td>contact-sales</td><td>partial</td><td>Requires a paid enterprise Salesforce Commerce Cloud contract and gated environment provisioning for API/sandbox access.</td></tr><tr><td>Squarespace</td><td>Ecommerce</td><td>paid plan</td><td>partial</td><td>API access (such as Orders and Inventory APIs and Developer Platform) requires higher-tier paid plans like Commerce Advanced or Core plans.</td></tr><tr><td>Amazon Selling Partner</td><td>Ecommerce</td><td>admin approval</td><td>partial</td><td>Requires a Professional selling account and manual developer profile approval from Amazon.</td></tr><tr><td>Sherlock</td><td>Data, SEO and Scraping</td><td>none</td><td>partial</td><td>No native REST or GraphQL API; can be used as a Python package dependency or via CLI.</td></tr><tr><td>Clay</td><td>Data, SEO and Scraping</td><td>paid plan</td><td>partial</td><td>No standalone public developer API for managing tables programmatically; integration relies on inbound webhooks and outbound HTTP API enrichments within paid workspace plans.</td></tr><tr><td>Paygent Connect</td><td>Finance and Fintech</td><td>contact-sales</td><td>partial</td><td>API documentation and modules require merchant contract, NDA agreement, and approval before access.</td></tr><tr><td>PitchBook</td><td>Finance and Fintech</td><td>contact-sales</td><td>partial</td><td>Requires contacting sales and entering a paid enterprise contract for Direct Data / API access.</td></tr><tr><td>NotebookLM</td><td>AI, Research and Media-native</td><td>paid plan</td><td>partial</td><td>Official APIs are restricted to Gemini Notebook Enterprise on Google Cloud; consumer NotebookLM lacks a public developer API.</td></tr><tr><td>Consensus</td><td>AI, Research and Media-native</td><td>contact-sales</td><td>partial</td><td>API is available by application only with custom quotes and paid pricing tiers.</td></tr></tbody>
-</table>
-</section>
+<section id="ledger-section">
+  <div class="wrap">
+    <div class="eyebrow">02 — Verification &amp; accuracy</div>
+    <h2 class="sec-title">Verification &amp; accuracy</h2>
+    <p class="sec-desc">
+      Accuracy is the part of the workflow I deliberately exposed. The first pass produced the 100-row dataset;
+      the second pass targeted the 27 rows where <code>mcp_exists</code> was false and checked them with additional
+      search + GitHub evidence.
+    </p>
 
-<section class="section card">
-<h2>Research agent & verification</h2>
-<p>The agent was implemented as a batch research workflow using Composio search tools with a Gemini model. For each app it was instructed to return a strict JSON object containing the requested fields and an evidence URL. The batch runner wrote one result per line and retried failures.</p>
-<div class="three">
-<div><span class="tag">Agent</span><p>Search → structured extraction → JSONL output.</p></div>
-<div><span class="tag">Human needed</span><p>Retry/review was required for records that initially failed parsing or timed out. The MCP-existence definition also needed a human correction after Pass 1 verification — the agent under-detected community MCP servers, and that required a manual spot-check to catch.</p></div>
-<div><span class="tag">Runnable proof</span><p><code>python run_batch.py</code> is the runnable trigger used by the workflow. No live deployment link is claimed here.</p></div>
+    <div class="accuracy-line">
+      <div class="stage">Pass 1 — 27 MCP=false candidates</div>
+      <div class="arrow">→ targeted MCP verification →</div>
+      <div class="stage p2">21 found MCP evidence · 6 remained no-MCP</div>
+    </div>
+
+    <div class="ledger" style="margin-top:26px;">
+      <div class="ledger-head">
+        <span class="tag">17 saved MCP corrections with evidence</span>
+        <span style="color:var(--ink-soft);font-size:11px;">click evidence ↗</span>
+      </div>
+      <div style="padding:18px;border-bottom:1px solid var(--hairline);font-family:var(--mono);font-size:12px;line-height:1.7;color:var(--ink-soft);">
+        <b style="color:var(--ink);">What changed:</b>
+        the first pass marked 27 apps as <code>mcp_exists=false</code>. The targeted verification experiment found
+        credible MCP evidence for 21 of those 27. The saved dataset below contains the corrected records for which
+        an MCP-specific evidence URL was persisted in JSON.
+      </div>
+      <div id="ledger-rows">
+<div class="ledger-row">
+  <div class="ledger-app">Binance</div>
+  <div class="ledger-diff">
+    <span class="diff-old">mcp_exists: false</span>
+    <span class="diff-arrow">→</span>
+    <span class="diff-new">mcp_exists: true</span>
+    <a class="ev-link" href="https://github.com/nirholas/Binance-MCP" target="_blank" rel="noopener">evidence ↗</a>
+  </div>
+  <div class="ledger-cause">Found credible community-built Model Context Protocol (MCP) servers for Binance, including implementations on GitHub such as nirholas/Binance-MCP and analyticace/binance-mcp-server.</div>
 </div>
-</section>
-
-<section class="section card">
-<h2>100-app research matrix</h2>
-<div class="toolbar">
-<input id="search" placeholder="Search apps or categories…" oninput="filterRows()">
-<select id="cat" onchange="filterRows()"><option value="">All categories</option>
-<option>AI, Research and Media-native</option><option>CRM and Sales</option><option>Communications and Messaging</option><option>Data, SEO and Scraping</option><option>Developer, Infra and Data platforms</option><option>Ecommerce</option><option>Finance and Fintech</option><option>Marketing, Ads, Email and Social</option><option>Productivity and Project Management</option><option>Support and Helpdesk</option>
-</select>
-<select id="build" onchange="filterRows()"><option value="">All buildability</option><option>yes</option><option>partial</option></select>
-<select id="mcp" onchange="filterRows()"><option value="">All MCP</option><option>Yes</option><option>No</option></select>
+<div class="ledger-row">
+  <div class="ledger-app">Consensus</div>
+  <div class="ledger-diff">
+    <span class="diff-old">mcp_exists: false</span>
+    <span class="diff-arrow">→</span>
+    <span class="diff-new">mcp_exists: true</span>
+    <a class="ev-link" href="https://docs.consensus.app/consensus-mcp" target="_blank" rel="noopener">evidence ↗</a>
+  </div>
+  <div class="ledger-cause">Consensus provides an official Model Context Protocol (MCP) server that enables AI assistants like Claude and ChatGPT to search and retrieve information from over 220 million peer-reviewed research papers.</div>
 </div>
-<table id="matrix">
-<thead><tr><th>App</th><th>Category</th><th>API</th><th>MCP</th><th>Access</th><th>Buildability</th><th>Auth</th><th>Evidence</th></tr></thead>
-<tbody><tr><td>Salesforce</td><td>CRM and Sales</td><td>both</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2, JWT</td><td><a href='https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/sforce_rest_api.htm' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>HubSpot</td><td>CRM and Sales</td><td>both</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2, Private app access token</td><td><a href='https://developers.hubspot.com/docs/apps/developer-platform/build-apps/authentication/overview' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Zendesk</td><td>Support and Helpdesk</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2, API key</td><td><a href='https://developer.zendesk.com/api-reference/introduction/security-and-auth/' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Intercom</td><td>Support and Helpdesk</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2, API key</td><td><a href='https://developers.intercom.com/docs/guides/mcp' target='_blank' rel='noopener'>Evidence</a></td></tr><tr class="flag-row"><td>Freshdesk<span class="flag-note">corrected after verification — was miscoded MCP: No</span></td><td>Support and Helpdesk</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>API key, OAuth2, Basic Auth</td><td><a href='https://developers.freshdesk.com/api/' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Pipedrive</td><td>CRM and Sales</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2, API key</td><td><a href='https://pipedrive.readme.io/docs/marketplace-oauth-api' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Attio</td><td>CRM and Sales</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2, API key</td><td><a href='https://docs.attio.com/rest-api/guides/authentication' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Twenty</td><td>CRM and Sales</td><td>both</td><td>Yes</td><td>self-serve</td><td>yes</td><td>API key</td><td><a href='https://twentyhq-twenty.mintlify.app/developers/api/rest-api' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Podio</td><td>CRM and Sales</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2</td><td><a href='https://podio.github.io/podio-js/authentication/' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Zoho CRM</td><td>CRM and Sales</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2, API key</td><td><a href='https://www.zoho.com/crm/developer/docs/mcp/overview.html' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Close</td><td>CRM and Sales</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>API key, OAuth2</td><td><a href='https://help.close.com/docs/mcp-server' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Copper</td><td>CRM and Sales</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>API Key, OAuth2</td><td><a href='https://developer.copper.com/' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>DealCloud</td><td>CRM and Sales</td><td>REST</td><td>Yes</td><td>gated</td><td>yes</td><td>OAuth2, API key</td><td><a href='https://api.docs.dealcloud.com/docs' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Front</td><td>Support and Helpdesk</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2, API key</td><td><a href='https://dev.frontapp.com/docs/core-api-overview' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Pylon</td><td>Support and Helpdesk</td><td>REST</td><td>Yes</td><td>gated</td><td>yes</td><td>API key</td><td><a href='https://docs.usepylon.com/pylon-docs/developer/api' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>LiveAgent</td><td>Support and Helpdesk</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>API key, OAuth2</td><td><a href='https://support.liveagent.com/567924-Documentation' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Plain</td><td>Support and Helpdesk</td><td>GraphQL</td><td>Yes</td><td>self-serve</td><td>yes</td><td>API key, OAuth2</td><td><a href='https://www.plain.com/docs/graphql/introduction' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Help Scout</td><td>Support and Helpdesk</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2, API key</td><td><a href='https://developer.helpscout.com/mailbox-api/overview/authentication/' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Gorgias</td><td>Support and Helpdesk</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>API key, OAuth2</td><td><a href='https://docs.gorgias.com/en-US/rest-api-208286' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Gladly</td><td>Support and Helpdesk</td><td>REST</td><td>No</td><td>self-serve</td><td>yes</td><td>API key</td><td><a href='https://developer.gladly.com/rest/' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Slack</td><td>Communications and Messaging</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2, API key</td><td><a href='https://api.slack.com/web' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Twilio</td><td>Communications and Messaging</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>API key, HTTP Basic</td><td><a href='https://www.twilio.com/docs/ai/mcp' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Zoho Cliq</td><td>Communications and Messaging</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2</td><td><a href='https://www.zoho.com/cliq/help/restapi/v3/introduction/' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Lark (Larksuite)</td><td>Communications and Messaging</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2, App Access Token</td><td><a href='https://open.larksuite.com/document/uAjLw4CM/ukTMukTMukTM/mcp_integration/mcp_introduction' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Pumble</td><td>Communications and Messaging</td><td>REST</td><td>No</td><td>self-serve</td><td>yes</td><td>API key</td><td><a href='https://pumble.com/help/integrations/automation-workflow-integrations/api-keys-integration/' target='_blank' rel='noopener'>Evidence</a></td></tr><tr class="flag-row"><td>Discord<span class="flag-note">no official MCP; community servers exist</span></td><td>Communications and Messaging</td><td>REST</td><td>No</td><td>self-serve</td><td>yes</td><td>OAuth2, API key, Bot token</td><td><a href='https://discord.com/developers/docs/intro' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Telegram</td><td>Communications and Messaging</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>API key</td><td><a href='https://core.telegram.org/bots/api' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>WhatsApp Business</td><td>Communications and Messaging</td><td>REST</td><td>No</td><td>self-serve</td><td>yes</td><td>OAuth2</td><td><a href='https://developers.facebook.com/documentation/business-messaging/whatsapp/get-started' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Aircall</td><td>Communications and Messaging</td><td>REST</td><td>No</td><td>self-serve</td><td>yes</td><td>Basic Auth, OAuth2</td><td><a href='https://developer.aircall.io/docs/authentication' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Vonage</td><td>Communications and Messaging</td><td>REST</td><td>No</td><td>self-serve</td><td>yes</td><td>API key, JWT</td><td><a href='https://developer.vonage.com/en/getting-started/concepts/authentication' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Google Ads</td><td>Marketing, Ads, Email and Social</td><td>REST</td><td>Yes</td><td>gated</td><td>yes</td><td>OAuth2</td><td><a href='https://developers.google.com/google-ads/api/docs/get-started/introduction' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Meta Ads</td><td>Marketing, Ads, Email and Social</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2, User access token</td><td><a href='https://developers.facebook.com/documentation/ads-commerce/marketing-api' target='_blank' rel='noopener'>Evidence</a></td></tr><tr class="flag-row"><td>LinkedIn Ads<span class="flag-note">verified — matches live docs exactly</span></td><td>Marketing, Ads, Email and Social</td><td>REST</td><td>No</td><td>gated</td><td>partial</td><td>OAuth2</td><td><a href='https://developer.linkedin.com/product-catalog/marketing' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>GoHighLevel</td><td>Marketing, Ads, Email and Social</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2, API key</td><td><a href='https://marketplace.gohighlevel.com/docs/other/mcp/' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Mailchimp</td><td>Marketing, Ads, Email and Social</td><td>REST</td><td>No</td><td>self-serve</td><td>yes</td><td>API key, OAuth2</td><td><a href='https://mailchimp.com/developer/marketing/docs/fundamentals/' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Klaviyo</td><td>Marketing, Ads, Email and Social</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>API key</td><td><a href='https://developers.klaviyo.com/' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>systeme.io</td><td>Marketing, Ads, Email and Social</td><td>REST</td><td>No</td><td>self-serve</td><td>yes</td><td>API key</td><td><a href='https://help.systeme.io/article/2323-how-to-use-systeme-io-public-api' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Pinterest</td><td>Marketing, Ads, Email and Social</td><td>REST</td><td>Yes</td><td>gated</td><td>yes</td><td>OAuth2</td><td><a href='https://developers.pinterest.com/docs/getting-started/connect-app/' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Threads (Meta)</td><td>Marketing, Ads, Email and Social</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2</td><td><a href='https://developers.facebook.com/documentation/threads/overview' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>SendGrid</td><td>Marketing, Ads, Email and Social</td><td>REST</td><td>No</td><td>self-serve</td><td>yes</td><td>API key</td><td><a href='https://www.twilio.com/docs/sendgrid/api-reference/how-to-use-the-sendgrid-v3-api/authentication' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Shopify</td><td>Ecommerce</td><td>both</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2, API key</td><td><a href='https://shopify.dev/docs/api/admin-graphql/latest' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>WooCommerce</td><td>Ecommerce</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>API key, OAuth 1.0a, Basic Auth</td><td><a href='https://woocommerce.com/document/woocommerce-rest-api/' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>BigCommerce</td><td>Ecommerce</td><td>both</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2, API key</td><td><a href='https://docs.bigcommerce.com/developer/docs/overview/api-fundamentals/api-accounts' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Salesforce Commerce Cloud</td><td>Ecommerce</td><td>REST</td><td>Yes</td><td>gated</td><td>partial</td><td>OAuth2</td><td><a href='https://developer.salesforce.com/docs/commerce/commerce-api/guide/why-use-scapi.html' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Magento (Adobe Commerce)</td><td>Ecommerce</td><td>both</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2, Bearer Token</td><td><a href='https://developer.adobe.com/commerce/webapi/rest/authentication/' target='_blank' rel='noopener'>Evidence</a></td></tr><tr class="flag-row"><td>Squarespace<span class="flag-note">gate reason verified — Commerce Advanced plan required</span></td><td>Ecommerce</td><td>REST</td><td>No</td><td>self-serve</td><td>partial</td><td>OAuth2, API key</td><td><a href='https://developers.squarespace.com/commerce-apis/authentication-and-permissions' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Ecwid</td><td>Ecommerce</td><td>REST</td><td>No</td><td>self-serve</td><td>yes</td><td>OAuth2, API key</td><td><a href='https://docs.ecwid.com/get-started/make-your-first-api-request' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Gumroad</td><td>Ecommerce</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2</td><td><a href='https://app.gumroad.com/api' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Amazon Selling Partner</td><td>Ecommerce</td><td>REST</td><td>Yes</td><td>gated</td><td>partial</td><td>OAuth2, API key</td><td><a href='https://developer-docs.amazon/sp-api/docs/register-as-a-private-developer' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>fanbasis</td><td>Ecommerce</td><td>REST</td><td>No</td><td>self-serve</td><td>yes</td><td>API key</td><td><a href='https://dev-docs.fanbasis.com/' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>DataForSEO</td><td>Data, SEO and Scraping</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>HTTP Basic</td><td><a href='https://docs.dataforseo.com/v3/auth/' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>SE Ranking</td><td>Data, SEO and Scraping</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>API key</td><td><a href='https://seranking.com/api/how-to-get-api/' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Ahrefs</td><td>Data, SEO and Scraping</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>API key, OAuth2</td><td><a href='https://docs.ahrefs.com/' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>MrScraper</td><td>Data, SEO and Scraping</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>API key</td><td><a href='https://docs.mrscraper.com/docs/api/overview' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Apify</td><td>Data, SEO and Scraping</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>API key, OAuth2</td><td><a href='https://docs.apify.com/api/v2' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Firecrawl</td><td>Data, SEO and Scraping</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>API key</td><td><a href='https://docs.firecrawl.dev/api-reference/v2-introduction' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Bright Data</td><td>Data, SEO and Scraping</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>API key, Bearer token</td><td><a href='https://docs.brightdata.com/api-reference/authentication' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Sherlock</td><td>Data, SEO and Scraping</td><td>none</td><td>No</td><td>self-serve</td><td>partial</td><td>None</td><td><a href='https://github.com/sherlock-project/sherlock/issues/2293' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Waterfall.io</td><td>Data, SEO and Scraping</td><td>REST</td><td>No</td><td>self-serve</td><td>yes</td><td>API key</td><td><a href='https://www.waterfall.io/' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Clay</td><td>Data, SEO and Scraping</td><td>REST</td><td>No</td><td>gated</td><td>partial</td><td>API key, Webhook</td><td><a href='https://university.clay.com/docs/http-api-integration-overview' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>GitHub</td><td>Developer, Infra and Data platforms</td><td>both</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2, Personal access tokens, GitHub App tokens</td><td><a href='https://docs.github.com/rest' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Vercel</td><td>Developer, Infra and Data platforms</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>API key, Bearer token, OAuth2</td><td><a href='https://vercel.com/docs/rest-api' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Netlify</td><td>Developer, Infra and Data platforms</td><td>REST</td><td>No</td><td>self-serve</td><td>yes</td><td>OAuth2, API key</td><td><a href='https://docs.netlify.com/api-and-cli-guides/api-guides/get-started-with-api/' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Cloudflare</td><td>Developer, Infra and Data platforms</td><td>both</td><td>Yes</td><td>self-serve</td><td>yes</td><td>API key, OAuth2</td><td><a href='https://developers.cloudflare.com/api/' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Supabase</td><td>Developer, Infra and Data platforms</td><td>both</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2, API key, Personal access token</td><td><a href='https://supabase.com/docs/guides/ai-tools/mcp' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Neo4j</td><td>Developer, Infra and Data platforms</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>API key, Basic auth, Bearer token</td><td><a href='https://neo4j.com/docs/http-api/current/' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Snowflake</td><td>Developer, Infra and Data platforms</td><td>REST</td><td>No</td><td>self-serve</td><td>yes</td><td>OAuth2, Key pair (JWT), API key</td><td><a href='https://docs.snowflake.com/en/developer-guide/snowflake-rest-api/authentication' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>MongoDB Atlas</td><td>Developer, Infra and Data platforms</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2, API key</td><td><a href='https://www.mongodb.com/docs/atlas/api/api-authentication/' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Datadog</td><td>Developer, Infra and Data platforms</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>API key, Application key</td><td><a href='https://docs.datadoghq.com/api/latest/authentication/' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Sentry</td><td>Developer, Infra and Data platforms</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2, API key</td><td><a href='https://docs.sentry.io/api/' target='_blank' rel='noopener'>Evidence</a></td></tr><tr class="flag-row"><td>Notion<span class="flag-note">verified — matches live docs exactly</span></td><td>Productivity and Project Management</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2, API key</td><td><a href='https://developers.notion.com/guides/get-started/overview' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Airtable</td><td>Productivity and Project Management</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2, Personal access token</td><td><a href='https://support.airtable.com/articles/9897799762-using-the-airtable-mcp-server' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Linear</td><td>Productivity and Project Management</td><td>GraphQL</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2, API key</td><td><a href='https://linear.app/developers/graphql' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Jira</td><td>Productivity and Project Management</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2, API key, Basic Auth</td><td><a href='https://developer.atlassian.com/cloud/jira/platform/rest-apis/' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Asana</td><td>Productivity and Project Management</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2, API key, OpenID Connect</td><td><a href='https://developers.asana.com/docs/authentication' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Monday.com</td><td>Productivity and Project Management</td><td>GraphQL</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2, API key</td><td><a href='https://developer.monday.com/api-reference/docs/authentication' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>ClickUp</td><td>Productivity and Project Management</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2, API key</td><td><a href='https://developer.clickup.com/docs/authentication' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Coda</td><td>Productivity and Project Management</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>API key, OAuth2</td><td><a href='https://coda.io/developers' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Smartsheet</td><td>Productivity and Project Management</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2, API key</td><td><a href='https://developers.smartsheet.com/api/smartsheet/introduction' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Harvest</td><td>Productivity and Project Management</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2, API key</td><td><a href='https://help.getharvest.com/api-v2/authentication-api/authentication/authentication/' target='_blank' rel='noopener'>Evidence</a></td></tr><tr class="flag-row"><td>Stripe<span class="flag-note">verified — matches live docs exactly</span></td><td>Finance and Fintech</td><td>REST</td><td>No</td><td>self-serve</td><td>yes</td><td>API key, OAuth2</td><td><a href='https://stripe.com/docs/api' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Plaid</td><td>Finance and Fintech</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>API key</td><td><a href='https://plaid.com/docs/api/' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Binance</td><td>Finance and Fintech</td><td>REST</td><td>No</td><td>self-serve</td><td>yes</td><td>API key</td><td><a href='https://github.com/binance/binance-spot-api-docs' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Paygent Connect</td><td>Finance and Fintech</td><td>REST</td><td>No</td><td>gated</td><td>partial</td><td>Merchant ID / Connect ID / Password, Client Certificate</td><td><a href='https://www.paygent.co.jp/payment_service/connect/module_type/' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>iPayX</td><td>Finance and Fintech</td><td>both</td><td>Yes</td><td>self-serve</td><td>yes</td><td>API key</td><td><a href='https://www.ipayx.ai/docs/mcp-server' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>QuickBooks</td><td>Finance and Fintech</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2</td><td><a href='https://developer.intuit.com' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Xero</td><td>Finance and Fintech</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2</td><td><a href='https://developer.xero.com/documentation/api/accounting/overview' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Brex</td><td>Finance and Fintech</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>API key, OAuth2</td><td><a href='https://developer.brex.com/guides/authentication' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Ramp</td><td>Finance and Fintech</td><td>REST</td><td>No</td><td>self-serve</td><td>yes</td><td>OAuth2, API key</td><td><a href='https://docs.ramp.com/developer/get-started' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>PitchBook</td><td>Finance and Fintech</td><td>REST</td><td>No</td><td>gated</td><td>partial</td><td>API key</td><td><a href='https://pitchbook.com/products/direct-access-data/api' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>NotebookLM</td><td>AI, Research and Media-native</td><td>REST</td><td>No</td><td>gated</td><td>partial</td><td>OAuth2</td><td><a href='https://docs.cloud.google.com/gemini/enterprise/notebooklm-enterprise/docs/api-notebooks' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Otter AI</td><td>AI, Research and Media-native</td><td>REST</td><td>Yes</td><td>gated</td><td>yes</td><td>API key, OAuth2</td><td><a href='https://help.otter.ai/hc/en-us/articles/36130822688279-Otter-ai-Public-API' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Fathom</td><td>AI, Research and Media-native</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>API key, OAuth2</td><td><a href='https://developers.fathom.ai/api-overview' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Consensus</td><td>AI, Research and Media-native</td><td>REST</td><td>No</td><td>gated</td><td>partial</td><td>API key</td><td><a href='https://consensus.app/home/api/' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Reducto</td><td>AI, Research and Media-native</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>API key</td><td><a href='https://docs.reducto.ai/mcp-server' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Devin</td><td>AI, Research and Media-native</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>API key</td><td><a href='https://docs.devin.ai/api-reference/overview' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>higgsfield</td><td>AI, Research and Media-native</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>API key, OAuth2</td><td><a href='https://higgsfield.ai/cli' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Mermaid CLI</td><td>AI, Research and Media-native</td><td>none</td><td>No</td><td>self-serve</td><td>yes</td><td>None</td><td><a href='https://github.com/mermaid-js/mermaid-cli' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>YouTube Transcript</td><td>AI, Research and Media-native</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>API key</td><td><a href='https://transcriptapi.com/docs/api/' target='_blank' rel='noopener'>Evidence</a></td></tr><tr><td>Grain</td><td>AI, Research and Media-native</td><td>REST</td><td>Yes</td><td>self-serve</td><td>yes</td><td>OAuth2, API key</td><td><a href='https://developers.grain.com/' target='_blank' rel='noopener'>Evidence</a></td></tr></tbody>
-</table>
+<div class="ledger-row">
+  <div class="ledger-app">Discord</div>
+  <div class="ledger-diff">
+    <span class="diff-old">mcp_exists: false</span>
+    <span class="diff-arrow">→</span>
+    <span class="diff-new">mcp_exists: true</span>
+    <a class="ev-link" href="https://github.com/PaSympa/discord-mcp/" target="_blank" rel="noopener">evidence ↗</a>
+  </div>
+  <div class="ledger-cause">Multiple community-built Model Context Protocol (MCP) servers exist for Discord, providing integration with MCP clients like Claude Desktop or Cursor for messaging, moderation, and server management.</div>
+</div>
+<div class="ledger-row">
+  <div class="ledger-app">Ecwid</div>
+  <div class="ledger-diff">
+    <span class="diff-old">mcp_exists: false</span>
+    <span class="diff-arrow">→</span>
+    <span class="diff-new">mcp_exists: true</span>
+    <a class="ev-link" href="https://glama.ai/mcp/connectors/io.usefulapi/ecwid" target="_blank" rel="noopener">evidence ↗</a>
+  </div>
+  <div class="ledger-cause">Credible MCP servers and integrations exist for Ecwid, provided by platforms such as UsefulAPI, Pipedream, Vinkius, and viaSocket, enabling AI assistants like Claude Desktop and Cursor to manage store inventory, orders, and products.</div>
+</div>
+<div class="ledger-row">
+  <div class="ledger-app">fanbasis</div>
+  <div class="ledger-diff">
+    <span class="diff-old">mcp_exists: false</span>
+    <span class="diff-arrow">→</span>
+    <span class="diff-new">mcp_exists: true</span>
+    <a class="ev-link" href="https://zapier.com/mcp/fanbasis" target="_blank" rel="noopener">evidence ↗</a>
+  </div>
+  <div class="ledger-cause">Zapier provides a FanBasis MCP server integration that allows AI models to connect with the FanBasis platform.</div>
+</div>
+<div class="ledger-row">
+  <div class="ledger-app">Freshdesk</div>
+  <div class="ledger-diff">
+    <span class="diff-old">mcp_exists: false</span>
+    <span class="diff-arrow">→</span>
+    <span class="diff-new">mcp_exists: true</span>
+    <a class="ev-link" href="https://support.freshdesk.com/support/solutions/articles/50000012670-model-context-protocol-mcp-integration-in-freshdesk-eap-" target="_blank" rel="noopener">evidence ↗</a>
+  </div>
+  <div class="ledger-cause">Freshdesk provides an official MCP integration via its Early Access Program (EAP), and multiple community-built MCP servers exist (such as wyre-technology/freshdesk-mcp).</div>
+</div>
+<div class="ledger-row">
+  <div class="ledger-app">Gladly</div>
+  <div class="ledger-diff">
+    <span class="diff-old">mcp_exists: false</span>
+    <span class="diff-arrow">→</span>
+    <span class="diff-new">mcp_exists: true</span>
+    <a class="ev-link" href="https://www.stackone.com/integrations" target="_blank" rel="noopener">evidence ↗</a>
+  </div>
+  <div class="ledger-cause">StackOne provides a hosted Model Context Protocol (MCP) server integration supporting Gladly with pre-built actions and managed authentication/security.</div>
+</div>
+<div class="ledger-row">
+  <div class="ledger-app">LinkedIn Ads</div>
+  <div class="ledger-diff">
+    <span class="diff-old">mcp_exists: false</span>
+    <span class="diff-arrow">→</span>
+    <span class="diff-new">mcp_exists: true</span>
+    <a class="ev-link" href="https://github.com/Nuraveda-Labs/linkedin-ads-mcp" target="_blank" rel="noopener">evidence ↗</a>
+  </div>
+  <div class="ledger-cause">Found credible community-built Model Context Protocol (MCP) servers and integrations specifically for LinkedIn Ads/Marketing (e.g., Nuraveda-Labs/linkedin-ads-mcp, mharnett/mcp-linkedin-ads).</div>
+</div>
+<div class="ledger-row">
+  <div class="ledger-app">Mailchimp</div>
+  <div class="ledger-diff">
+    <span class="diff-old">mcp_exists: false</span>
+    <span class="diff-arrow">→</span>
+    <span class="diff-new">mcp_exists: true</span>
+    <a class="ev-link" href="https://pypi.org/project/mailchimp-mcp/" target="_blank" rel="noopener">evidence ↗</a>
+  </div>
+  <div class="ledger-cause">A community-built MCP server exists for Mailchimp (available on PyPI as mailchimp-mcp and via GitHub repositories like damientilman/mailchimp-mcp-server) enabling AI agents to interact with Mailchimp&#x27;s API.</div>
+</div>
+<div class="ledger-row">
+  <div class="ledger-app">PitchBook</div>
+  <div class="ledger-diff">
+    <span class="diff-old">mcp_exists: false</span>
+    <span class="diff-arrow">→</span>
+    <span class="diff-new">mcp_exists: true</span>
+    <a class="ev-link" href="https://ciofirst.com/pitchbook-partners-with-perplexity-to-deliver-ai-market-intelligence/" target="_blank" rel="noopener">evidence ↗</a>
+  </div>
+  <div class="ledger-cause">PitchBook provides official MCP support via a dedicated Model Context Protocol server (https://premium.mcp.pitchbook.com/mcp) and an integration with Perplexity for AI-powered private market intelligence.</div>
+</div>
+<div class="ledger-row">
+  <div class="ledger-app">Ramp</div>
+  <div class="ledger-diff">
+    <span class="diff-old">mcp_exists: false</span>
+    <span class="diff-arrow">→</span>
+    <span class="diff-new">mcp_exists: true</span>
+    <a class="ev-link" href="https://github.com/ramp-public/ramp_mcp" target="_blank" rel="noopener">evidence ↗</a>
+  </div>
+  <div class="ledger-cause">Ramp provides an official MCP server (ramp-public/ramp-mcp) as well as a developer MCP server via their documentation and engineering portal.</div>
+</div>
+<div class="ledger-row">
+  <div class="ledger-app">SendGrid</div>
+  <div class="ledger-diff">
+    <span class="diff-old">mcp_exists: false</span>
+    <span class="diff-arrow">→</span>
+    <span class="diff-new">mcp_exists: true</span>
+    <a class="ev-link" href="https://github.com/justinritchie/mcp-sendgrid-server" target="_blank" rel="noopener">evidence ↗</a>
+  </div>
+  <div class="ledger-cause">Found credible community-built MCP servers for SendGrid, including repositories and npm packages such as justinritchie/mcp-sendgrid-server and mcp-sendgrid-server.</div>
+</div>
+<div class="ledger-row">
+  <div class="ledger-app">Snowflake</div>
+  <div class="ledger-diff">
+    <span class="diff-old">mcp_exists: false</span>
+    <span class="diff-arrow">→</span>
+    <span class="diff-new">mcp_exists: true</span>
+    <a class="ev-link" href="https://github.com/Data-Alchemists/snowflake-mcp" target="_blank" rel="noopener">evidence ↗</a>
+  </div>
+  <div class="ledger-cause">Verified existence of Model Context Protocol (MCP) servers/integrations for Snowflake, including community implementations such as Snowflake MCP servers on GitHub.</div>
+</div>
+<div class="ledger-row">
+  <div class="ledger-app">Squarespace</div>
+  <div class="ledger-diff">
+    <span class="diff-old">mcp_exists: false</span>
+    <span class="diff-arrow">→</span>
+    <span class="diff-new">mcp_exists: true</span>
+    <a class="ev-link" href="https://developers.squarespace.com/mcp/mcp" target="_blank" rel="noopener">evidence ↗</a>
+  </div>
+  <div class="ledger-cause">Squarespace provides an official MCP server for domain search and brand-name generation.</div>
+</div>
+<div class="ledger-row">
+  <div class="ledger-app">Stripe</div>
+  <div class="ledger-diff">
+    <span class="diff-old">mcp_exists: false</span>
+    <span class="diff-arrow">→</span>
+    <span class="diff-new">mcp_exists: true</span>
+    <a class="ev-link" href="https://docs.stripe.com/mcp" target="_blank" rel="noopener">evidence ↗</a>
+  </div>
+  <div class="ledger-cause">Stripe provides an official Model Context Protocol (MCP) server for Stripe APIs (available via https://mcp.stripe.com or via Stripe&#x27;s GitHub repositories), allowing MCP clients to interact with Stripe tools.</div>
+</div>
+<div class="ledger-row">
+  <div class="ledger-app">systeme.io</div>
+  <div class="ledger-diff">
+    <span class="diff-old">mcp_exists: false</span>
+    <span class="diff-arrow">→</span>
+    <span class="diff-new">mcp_exists: true</span>
+    <a class="ev-link" href="https://help.systeme.io/article/9489-how-to-use-systeme-ios-mcp" target="_blank" rel="noopener">evidence ↗</a>
+  </div>
+  <div class="ledger-cause">Systeme.io provides official help documentation detailing how to use their Model Context Protocol (MCP) server integration with AI assistants like Claude, and community implementations exist on GitHub (e.g. snzeeee/mcp-server-systemeio).</div>
+</div>
+<div class="ledger-row">
+  <div class="ledger-app">Vonage</div>
+  <div class="ledger-diff">
+    <span class="diff-old">mcp_exists: false</span>
+    <span class="diff-arrow">→</span>
+    <span class="diff-new">mcp_exists: true</span>
+    <a class="ev-link" href="https://developer.vonage.com/en/mcp-server/overview" target="_blank" rel="noopener">evidence ↗</a>
+  </div>
+  <div class="ledger-cause">Vonage provides official MCP servers (@vonage/vonage-mcp-server-api-bindings and a Documentation MCP server) to allow AI agents to interact with Vonage APIs and documentation.</div>
+</div>
+      </div>
+      <div style="padding:18px;font-family:var(--mono);font-size:12px;line-height:1.7;color:var(--ink-soft);">
+        <b style="color:var(--ink);">Honest disclosure:</b>
+        the 21/27 number is the outcome of the targeted MCP verification experiment. This ledger shows the
+        corrected records that actually carry <code>mcp_evidence_url</code> in the saved dataset.
+      </div>
+    </div>
+
+    <p style="font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-top:16px;">
+      <b style="color:var(--ink);">Why the second pass exists:</b>
+      community and third-party MCP servers can be harder to discover through the normal first-pass search path.
+      Rather than rerunning all 100 apps, the workflow rechecked only the MCP=false candidates.
+    </p>
+  </div>
+</section>
+<section id="table-section">
+  <div class="wrap">
+    <div class="eyebrow">03 — Full dataset</div>
+    <h2 class="sec-title">All 100 apps, saved results after MCP verification</h2>
+    <p class="sec-desc">Category-level opportunity snapshot from the saved 100-app research results, including the MCP verification updates.</p>
+
+    <div class="filter-bar">
+      <input id="search" type="text" placeholder="search app name or evidence...">
+      <div class="chip active" data-filter="all">all</div>
+      <div class="chip" data-filter="mcp">mcp only</div>
+      <div class="chip" data-filter="nomcp">no mcp</div>
+      <div class="chip" data-filter="gated">gated</div>
+      <div class="chip" data-filter="corrected">corrected (MCP verified)</div>
+      <select id="category-select" style="font-family:var(--mono);font-size:12px;padding:7px 10px;border:1px solid var(--hairline);background:var(--paper-raised);color:var(--ink-soft);">
+        <option value="">all categories</option>
+      </select>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>App</th>
+            <th>Category</th>
+            <th>Auth</th>
+            <th>Access</th>
+            <th>API surface</th>
+            <th>MCP</th>
+            <th>Buildable / blocker</th>
+            <th>Evidence</th>
+          </tr>
+        </thead>
+        <tbody id="app-table-body"></tbody>
+      </table>
+    </div>
+    <div class="row-count" id="row-count"></div>
+  </div>
 </section>
 
-<div class="footer">Generated from the completed 100-app research output. Counts are descriptive of this research set, not a claim about the entire software market. MCP column reflects a mix of official and (where noted) community servers; see verification section above for methodology and known limitation.</div>
-</main>
+<section id="agent-section">
+  <div class="wrap">
+    <div class="eyebrow">04 — How the agent works</div>
+    <h2 class="sec-title">Pipeline, and where a human stepped in</h2>
+    <p class="sec-desc">Built on the Composio SDK for the search/fetch tool layer and Gemini for structured extraction and verdict reasoning. A targeted GitHub-assisted MCP verification pass was added after the first batch.</p>
+    <div class="pipeline">
+      <div class="pstep">
+        <div class="pn">1</div>
+        <div class="pc"><div class="pt">Batch dispatch</div><div class="pd">Each of the 100 apps is sent to the agent one at a time with a name, category hint, and a fixed schema to fill: auth methods, self-serve vs. gated, API surface, MCP existence, buildability verdict, and an evidence URL.</div></div>
+      </div>
+      <div class="pstep">
+        <div class="pn">2</div>
+        <div class="pc"><div class="pt">Tool-using research loop</div><div class="pd">The agent calls web search and page-fetch tools through Composio, reads official developer docs, and returns strict JSON — no free text, so 100 runs stay machine-comparable.</div></div>
+      </div>
+      <div class="pstep">
+        <div class="pn">3</div>
+        <div class="pc"><div class="pt">Human sampling (the honest part)</div><div class="pd">27 of the 100 rows were checked in the targeted MCP verification pass: 6 remained genuinely "no MCP" and 21 had credible MCP evidence, including community/third-party implementations.</div></div>
+      </div>
+      <div class="pstep">
+        <div class="pn">4</div>
+        <div class="pc"><div class="pt">GitHub-augmented rerun</div><div class="pd">The 27 MCP=false candidates were re-checked with additional search/GitHub evidence. 21 had MCP evidence; 6 remained false.</div></div>
+      </div>
+      <div class="pstep">
+        <div class="pn">5</div>
+        <div class="pc"><div class="pt">Pattern rollup</div><div class="pd">The auth, access, and buildability distributions remain from the completed first-pass dataset; the MCP verification findings are reported separately so they are not mixed into the original run.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="proof">
+  <div class="wrap">
+    <div class="eyebrow">04 — The proof</div>
+    <h2 class="sec-title">What is actually runnable</h2>
+    <p class="sec-desc">The repository contains the batch runner, structured output, analysis utility, and the interactive case study.</p>
+    <div class="pipeline">
+      <div class="pstep"><div class="pn">1</div><div class="pc"><div class="pt">Draft research</div><div class="pd"><code>python run_batch.py</code> reads <code>apps.csv</code>, researches each app with Gemini + Composio Search, and appends one JSON object per app to <code>results.jsonl</code>.</div></div></div>
+      <div class="pstep"><div class="pn">2</div><div class="pc"><div class="pt">Resumable output</div><div class="pd">Existing app names in <code>results.jsonl</code> are skipped, so the batch can resume after interruptions.</div></div></div>
+      <div class="pstep"><div class="pn">3</div><div class="pc"><div class="pt">Targeted MCP verification</div><div class="pd">The MCP=false candidate set is re-checked with additional search/GitHub evidence instead of rerunning all 100 apps.</div></div></div>
+      <div class="pstep"><div class="pn">4</div><div class="pc"><div class="pt">Pattern rollup</div><div class="pd"><code>python analyze.py</code> reads the results and generates the aggregate patterns used in the case study.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="verification-hits">
+  <div class="wrap">
+    <div class="eyebrow">05 — Verification hits &amp; misses</div>
+    <h2 class="sec-title">Verification — hits and misses, shown honestly</h2>
+    <p class="sec-desc">
+      The first-pass dataset marked a set of apps as <code>mcp_exists: false</code>. I then ran a targeted
+      MCP verification pass using additional search + GitHub evidence. The examples below show the exact
+      kind of correction the second pass was designed to catch.
+    </p>
+
+    <div class="verification-card" style="margin-top:24px;border-top:1px solid var(--hairline);padding-top:24px;">
+      <div style="font-family:var(--sans);font-size:18px;font-weight:650;">Freshdesk</div>
+      <div style="font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-top:6px;">MCP correction</div>
+
+      <div style="margin-top:16px;font-family:var(--mono);font-size:12px;line-height:1.75;">
+        <div><b>Pass 1 claim</b></div>
+        <div style="color:var(--deny);">mcp_exists: false</div>
+
+        <div style="margin-top:12px;"><b>Pass 2 — targeted MCP re-check</b></div>
+        <div style="color:var(--confirm);">mcp_exists: true</div>
+
+        <div style="margin-top:12px;">
+          Freshdesk provides an official MCP integration via its Early Access Program (EAP), and multiple community-built MCP servers exist (such as wyre-technology/freshdesk-mcp).
+        </div>
+
+        <div style="margin-top:12px;">
+          <a class="ev-link" href="https://support.freshdesk.com/support/solutions/articles/50000012670-model-context-protocol-mcp-integration-in-freshdesk-eap-" target="_blank" rel="noopener">MCP evidence ↗</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="verification-card" style="margin-top:24px;border-top:1px solid var(--hairline);padding-top:24px;">
+      <div style="font-family:var(--sans);font-size:18px;font-weight:650;">Discord</div>
+      <div style="font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-top:6px;">MCP correction</div>
+
+      <div style="margin-top:16px;font-family:var(--mono);font-size:12px;line-height:1.75;">
+        <div><b>Pass 1 claim</b></div>
+        <div style="color:var(--deny);">mcp_exists: false</div>
+
+        <div style="margin-top:12px;"><b>Pass 2 — targeted MCP re-check</b></div>
+        <div style="color:var(--confirm);">mcp_exists: true</div>
+
+        <div style="margin-top:12px;">
+          Multiple community-built Model Context Protocol (MCP) servers exist for Discord, providing integration with MCP clients like Claude Desktop or Cursor for messaging, moderation, and server management.
+        </div>
+
+        <div style="margin-top:12px;">
+          <a class="ev-link" href="https://github.com/PaSympa/discord-mcp/" target="_blank" rel="noopener">MCP evidence ↗</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="verification-card" style="margin-top:24px;border-top:1px solid var(--hairline);padding-top:24px;">
+      <div style="font-family:var(--sans);font-size:18px;font-weight:650;">Vonage</div>
+      <div style="font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-top:6px;">MCP correction</div>
+
+      <div style="margin-top:16px;font-family:var(--mono);font-size:12px;line-height:1.75;">
+        <div><b>Pass 1 claim</b></div>
+        <div style="color:var(--deny);">mcp_exists: false</div>
+
+        <div style="margin-top:12px;"><b>Pass 2 — targeted MCP re-check</b></div>
+        <div style="color:var(--confirm);">mcp_exists: true</div>
+
+        <div style="margin-top:12px;">
+          Vonage provides official MCP servers (@vonage/vonage-mcp-server-api-bindings and a Documentation MCP server) to allow AI agents to interact with Vonage APIs and documentation.
+        </div>
+
+        <div style="margin-top:12px;">
+          <a class="ev-link" href="https://developer.vonage.com/en/mcp-server/overview" target="_blank" rel="noopener">MCP evidence ↗</a>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:28px;padding:18px;border:1px solid var(--hairline);background:var(--paper-raised);font-family:var(--mono);font-size:12px;line-height:1.75;color:var(--ink-soft);">
+      <b style="color:var(--ink);">Scope note:</b>
+      these are representative evidence-backed MCP corrections from the saved dataset. The broader verification
+      experiment covered 27 initial MCP=false candidates, of which 21 had credible MCP evidence and 6 remained
+      without a credible MCP path.
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="eyebrow">05 — Links</div>
+    <div class="foot-links">
+      <a <a href="https://github.com/Yashwanth-Programmer/composio-research-agent" id="repo-link" target="_blank" rel="noopener">GitHub Repo →</a>
+    </div>
+    <p class="foot-note">Replace the two placeholder links above before submitting — point them at your pushed repo and your Vercel/Netlify/GH Pages deploy of this file.</p>
+  </div>
+</footer>
+
+<script id="app-data" type="application/json">
+[{"one_liner":"Salesforce is a cloud-based customer relationship management (CRM) platform for managing sales, customer service, marketing, and business operations.","auth_methods":["OAuth2","JWT"],"self_serve":"self-serve","gate_reason":"none","api_surface":"both","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/sforce_rest_api.htm","confidence":1.0,"_app_name":"Salesforce","category":"CRM and Sales","corrected":false},{"one_liner":"Customer relationship management platform for sales, marketing, and customer service automation.","auth_methods":["OAuth2","Private app access token"],"self_serve":"self-serve","gate_reason":"none","api_surface":"both","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://developers.hubspot.com/docs/apps/developer-platform/build-apps/authentication/overview","confidence":1.0,"_app_name":"HubSpot","category":"CRM and Sales","corrected":false},{"one_liner":"A cloud-based customer service software and support ticketing platform.","auth_methods":["OAuth2","API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://developer.zendesk.com/api-reference/introduction/security-and-auth/","confidence":1.0,"_app_name":"Zendesk","category":"Support and Helpdesk","corrected":false},{"one_liner":"Customer service platform with a suite of messaging, ticketing, and AI-powered support tools.","auth_methods":["OAuth2","API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://developers.intercom.com/docs/guides/mcp","confidence":1.0,"_app_name":"Intercom","category":"Support and Helpdesk","corrected":false},{"one_liner":"Freshdesk is a cloud-based customer service and helpdesk software that provides ticketing, SLA management, and multi-channel support.","auth_methods":["API key","OAuth2","Basic Auth"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://developers.freshdesk.com/api/","confidence":1.0,"_app_name":"Freshdesk","mcp_evidence_url":"https://support.freshdesk.com/support/solutions/articles/50000012670-model-context-protocol-mcp-integration-in-freshdesk-eap-","mcp_notes":"Freshdesk provides an official MCP integration via its Early Access Program (EAP), and multiple community-built MCP servers exist (such as wyre-technology/freshdesk-mcp).","category":"Support and Helpdesk","corrected":true},{"one_liner":"Pipedrive is a web-based Sales CRM and pipeline management software that helps businesses track leads, deals, and customer interactions.","auth_methods":["OAuth2","API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://pipedrive.readme.io/docs/marketplace-oauth-api","confidence":1.0,"_app_name":"Pipedrive","category":"CRM and Sales","corrected":false},{"one_liner":"Attio is a flexible, data-driven CRM platform that helps teams build custom customer relationship management workflows.","auth_methods":["OAuth2","API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://docs.attio.com/rest-api/guides/authentication","confidence":1.0,"_app_name":"Attio","category":"CRM and Sales","corrected":false},{"one_liner":"An open-source CRM alternative designed for modern teams and AI integration.","auth_methods":["API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"both","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://twentyhq-twenty.mintlify.app/developers/api/rest-api","confidence":1.0,"_app_name":"Twenty","category":"CRM and Sales","corrected":false},{"one_liner":"Work management and collaboration platform providing structured workspaces, apps, and task tracking.","auth_methods":["OAuth2"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://podio.github.io/podio-js/authentication/","confidence":0.95,"_app_name":"Podio","category":"CRM and Sales","corrected":false},{"one_liner":"A comprehensive cloud-based customer relationship management (CRM) software for managing sales, marketing, and customer support.","auth_methods":["OAuth2","API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://www.zoho.com/crm/developer/docs/mcp/overview.html","confidence":1.0,"_app_name":"Zoho CRM","category":"CRM and Sales","corrected":false},{"one_liner":"Close is a CRM and sales communication software designed for inside sales teams.","auth_methods":["API key","OAuth2"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://help.close.com/docs/mcp-server","confidence":1.0,"_app_name":"Close","category":"CRM and Sales","corrected":false},{"one_liner":"Copper is a Google Workspace-integrated CRM for managing leads, contacts, sales pipelines, and customer relationships.","auth_methods":["API Key","OAuth2"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://developer.copper.com/","confidence":1.0,"_app_name":"Copper","category":"CRM and Sales","corrected":false},{"one_liner":"Financial CRM and deal management platform for private capital markets, investment banking, and private equity.","auth_methods":["OAuth2","API key"],"self_serve":"gated","gate_reason":"contact-sales","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://api.docs.dealcloud.com/docs","confidence":0.95,"_app_name":"DealCloud","category":"CRM and Sales","corrected":false},{"one_liner":"Customer operations platform unifying email, support, and messaging channels into shared team inboxes.","auth_methods":["OAuth2","API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://dev.frontapp.com/docs/core-api-overview","confidence":0.95,"_app_name":"Front","category":"Support and Helpdesk","corrected":false},{"one_liner":"B2B customer support and ticketing platform unifying Slack, Teams, email, and in-app communications.","auth_methods":["API key"],"self_serve":"gated","gate_reason":"contact-sales","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://docs.usepylon.com/pylon-docs/developer/api","confidence":1.0,"_app_name":"Pylon","category":"Support and Helpdesk","corrected":false},{"one_liner":"Multi-channel customer support and helpdesk software providing ticketing, live chat, call center, and knowledge base management.","auth_methods":["API key","OAuth2"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://support.liveagent.com/567924-Documentation","confidence":1.0,"_app_name":"LiveAgent","category":"Support and Helpdesk","corrected":false},{"one_liner":"API-first customer support platform designed for modern tech and B2B SaaS teams.","auth_methods":["API key","OAuth2"],"self_serve":"self-serve","gate_reason":"none","api_surface":"GraphQL","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://www.plain.com/docs/graphql/introduction","confidence":1.0,"_app_name":"Plain","category":"Support and Helpdesk","corrected":false},{"one_liner":"Help Scout is a customer service platform providing shared inbox, help desk, knowledge base, and customer support tools.","auth_methods":["OAuth2","API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://developer.helpscout.com/mailbox-api/overview/authentication/","confidence":1.0,"_app_name":"Help Scout","category":"Support and Helpdesk","corrected":false},{"one_liner":"Customer service and helpdesk platform designed for e-commerce businesses.","auth_methods":["API key","OAuth2"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://docs.gorgias.com/en-US/rest-api-208286","confidence":1.0,"_app_name":"Gorgias","category":"Support and Helpdesk","corrected":false},{"one_liner":"Gladly is a customer service platform centered around people and conversations rather than tickets.","auth_methods":["API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://developer.gladly.com/rest/","confidence":0.95,"_app_name":"Gladly","mcp_evidence_url":"https://www.stackone.com/integrations","mcp_notes":"StackOne provides a hosted Model Context Protocol (MCP) server integration supporting Gladly with pre-built actions and managed authentication/security.","category":"Support and Helpdesk","corrected":true},{"one_liner":"A channel-based messaging platform for team collaboration, communications, and third-party integrations.","auth_methods":["OAuth2","API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://api.slack.com/web","confidence":1.0,"_app_name":"Slack","category":"Communications and Messaging","corrected":false},{"one_liner":"Cloud communications platform providing APIs for programmable SMS, voice, email, and authentication.","auth_methods":["API key","HTTP Basic"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://www.twilio.com/docs/ai/mcp","confidence":1.0,"_app_name":"Twilio","category":"Communications and Messaging","corrected":false},{"one_liner":"Team collaboration and messaging software with a REST API and MCP support for AI agents.","auth_methods":["OAuth2"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://www.zoho.com/cliq/help/restapi/v3/introduction/","confidence":1.0,"_app_name":"Zoho Cliq","category":"Communications and Messaging","corrected":false},{"one_liner":"Enterprise collaboration suite combining team messenger, calendar, docs, sheets, and project management into a single platform.","auth_methods":["OAuth2","App Access Token"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://open.larksuite.com/document/uAjLw4CM/ukTMukTMukTM/mcp_integration/mcp_introduction","confidence":1.0,"_app_name":"Lark (Larksuite)","category":"Communications and Messaging","corrected":false},{"one_liner":"Pumble is a team collaboration and messaging app offering channels, direct messages, and team communication features.","auth_methods":["API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":false,"buildability":"yes","blocker":"","evidence_url":"https://pumble.com/help/integrations/automation-workflow-integrations/api-keys-integration/","confidence":0.95,"_app_name":"Pumble","category":"Communications and Messaging","corrected":false},{"one_liner":"Discord is a voice, video, and text communication service used by tens of millions of people to talk and hang out with their communities and friends.","auth_methods":["OAuth2","API key","Bot token"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://discord.com/developers/docs/intro","confidence":1.0,"_app_name":"Discord","mcp_evidence_url":"https://github.com/PaSympa/discord-mcp/","mcp_notes":"Multiple community-built Model Context Protocol (MCP) servers exist for Discord, providing integration with MCP clients like Claude Desktop or Cursor for messaging, moderation, and server management.","category":"Communications and Messaging","corrected":true},{"one_liner":"Cloud-based instant messaging service providing bot and client APIs for automated and custom messaging.","auth_methods":["API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://core.telegram.org/bots/api","confidence":1.0,"_app_name":"Telegram","category":"Communications and Messaging","corrected":false},{"one_liner":"Allows businesses to communicate with customers globally via automated messaging and notifications on WhatsApp.","auth_methods":["OAuth2"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":false,"buildability":"yes","blocker":"","evidence_url":"https://developers.facebook.com/documentation/business-messaging/whatsapp/get-started","confidence":1.0,"_app_name":"WhatsApp Business","category":"Communications and Messaging","corrected":false},{"one_liner":"Aircall is a cloud-based call center software and phone system designed for modern businesses.","auth_methods":["Basic Auth","OAuth2"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":false,"buildability":"yes","blocker":"","evidence_url":"https://developer.aircall.io/docs/authentication","confidence":0.95,"_app_name":"Aircall","category":"Communications and Messaging","corrected":false},{"one_liner":"Cloud communications platform providing APIs for SMS, voice, video, and messaging.","auth_methods":["API key","JWT"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://developer.vonage.com/en/getting-started/concepts/authentication","confidence":1.0,"_app_name":"Vonage","mcp_evidence_url":"https://developer.vonage.com/en/mcp-server/overview","mcp_notes":"Vonage provides official MCP servers (@vonage/vonage-mcp-server-api-bindings and a Documentation MCP server) to allow AI agents to interact with Vonage APIs and documentation.","category":"Communications and Messaging","corrected":true},{"one_liner":"Programmatic interface for managing large or complex Google Ads accounts, campaigns, and reporting.","auth_methods":["OAuth2"],"self_serve":"gated","gate_reason":"admin approval","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://developers.google.com/google-ads/api/docs/get-started/introduction","confidence":1.0,"_app_name":"Google Ads","category":"Marketing, Ads, Email and Social","corrected":false},{"one_liner":"Marketing API enables developers to manage ad campaigns, ad sets, creatives, audiences, and insights across Meta technologies.","auth_methods":["OAuth2","User access token"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://developers.facebook.com/documentation/ads-commerce/marketing-api","confidence":1.0,"_app_name":"Meta Ads","category":"Marketing, Ads, Email and Social","corrected":false},{"one_liner":"LinkedIn Ads is an advertising platform enabling businesses to create, manage, and optimize targeted marketing campaigns on LinkedIn.","auth_methods":["OAuth2"],"self_serve":"gated","gate_reason":"admin approval","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"partial","blocker":"Requires approved Marketing Developer Platform (MDP) partnership and application review for full advertising and marketing API access.","evidence_url":"https://developer.linkedin.com/product-catalog/marketing","confidence":0.95,"_app_name":"LinkedIn Ads","mcp_evidence_url":"https://github.com/Nuraveda-Labs/linkedin-ads-mcp","mcp_notes":"Found credible community-built Model Context Protocol (MCP) servers and integrations specifically for LinkedIn Ads/Marketing (e.g., Nuraveda-Labs/linkedin-ads-mcp, mharnett/mcp-linkedin-ads).","category":"Marketing, Ads, Email and Social","corrected":true},{"one_liner":"An all-in-one sales and marketing platform for agencies and small businesses providing CRM, email, SMS, funnels, and automation.","auth_methods":["OAuth2","API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://marketplace.gohighlevel.com/docs/other/mcp/","confidence":1.0,"_app_name":"GoHighLevel","category":"Marketing, Ads, Email and Social","corrected":false},{"one_liner":"An all-in-one marketing platform for email campaigns, automation, and audience management.","auth_methods":["API key","OAuth2"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://mailchimp.com/developer/marketing/docs/fundamentals/","confidence":1.0,"_app_name":"Mailchimp","mcp_evidence_url":"https://pypi.org/project/mailchimp-mcp/","mcp_notes":"A community-built MCP server exists for Mailchimp (available on PyPI as mailchimp-mcp and via GitHub repositories like damientilman/mailchimp-mcp-server) enabling AI agents to interact with Mailchimp's API.","category":"Marketing, Ads, Email and Social","corrected":true},{"one_liner":"A marketing automation platform providing email, SMS, and data-driven customer segmentation tools via robust APIs.","auth_methods":["API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://developers.klaviyo.com/","confidence":1.0,"_app_name":"Klaviyo","category":"Marketing, Ads, Email and Social","corrected":false},{"one_liner":"Systeme.io is an all-in-one marketing platform providing sales funnels, email marketing, website building, online courses, and affiliate program management.","auth_methods":["API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://help.systeme.io/article/2323-how-to-use-systeme-io-public-api","confidence":1.0,"_app_name":"systeme.io","mcp_evidence_url":"https://help.systeme.io/article/9489-how-to-use-systeme-ios-mcp","mcp_notes":"Systeme.io provides official help documentation detailing how to use their Model Context Protocol (MCP) server integration with AI assistants like Claude, and community implementations exist on GitHub (e.g. snzeeee/mcp-server-systemeio).","category":"Marketing, Ads, Email and Social","corrected":true},{"one_liner":"Visual discovery and bookmarking engine that enables users to find ideas like recipes, home decor, and style inspiration.","auth_methods":["OAuth2"],"self_serve":"gated","gate_reason":"admin approval","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://developers.pinterest.com/docs/getting-started/connect-app/","confidence":1.0,"_app_name":"Pinterest","category":"Marketing, Ads, Email and Social","corrected":false},{"one_liner":"Official Meta API for publishing content, retrieving media, and managing replies on Threads.","auth_methods":["OAuth2"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://developers.facebook.com/documentation/threads/overview","confidence":1.0,"_app_name":"Threads (Meta)","category":"Marketing, Ads, Email and Social","corrected":false},{"one_liner":"Cloud-based email delivery, marketing, and transactional email management platform.","auth_methods":["API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://www.twilio.com/docs/sendgrid/api-reference/how-to-use-the-sendgrid-v3-api/authentication","confidence":1.0,"_app_name":"SendGrid","mcp_evidence_url":"https://github.com/justinritchie/mcp-sendgrid-server","mcp_notes":"Found credible community-built MCP servers for SendGrid, including repositories and npm packages such as justinritchie/mcp-sendgrid-server and mcp-sendgrid-server.","category":"Marketing, Ads, Email and Social","corrected":true},{"one_liner":"E-commerce platform providing APIs to build online stores, manage products, orders, and customer data.","auth_methods":["OAuth2","API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"both","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://shopify.dev/docs/api/admin-graphql/latest","confidence":1.0,"_app_name":"Shopify","category":"Ecommerce","corrected":false},{"one_liner":"A customizable, open-source e-commerce platform built on WordPress for online stores.","auth_methods":["API key","OAuth 1.0a","Basic Auth"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://woocommerce.com/document/woocommerce-rest-api/","confidence":1.0,"_app_name":"WooCommerce","category":"Ecommerce","corrected":false},{"one_liner":"A leading Open SaaS e-commerce platform providing robust APIs for building online storefronts and apps.","auth_methods":["OAuth2","API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"both","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://docs.bigcommerce.com/developer/docs/overview/api-fundamentals/api-accounts","confidence":1.0,"_app_name":"BigCommerce","category":"Ecommerce","corrected":false},{"one_liner":"Enterprise e-commerce platform providing APIs for storefronts, orders, and customer management.","auth_methods":["OAuth2"],"self_serve":"gated","gate_reason":"contact-sales","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"partial","blocker":"Requires a paid enterprise Salesforce Commerce Cloud contract and gated environment provisioning for API/sandbox access.","evidence_url":"https://developer.salesforce.com/docs/commerce/commerce-api/guide/why-use-scapi.html","confidence":0.95,"_app_name":"Salesforce Commerce Cloud","category":"Ecommerce","corrected":false},{"one_liner":"Open-source and enterprise e-commerce platform offering robust REST and GraphQL APIs for managing online stores.","auth_methods":["OAuth2","Bearer Token"],"self_serve":"self-serve","gate_reason":"none","api_surface":"both","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://developer.adobe.com/commerce/webapi/rest/authentication/","confidence":1.0,"_app_name":"Magento (Adobe Commerce)","category":"Ecommerce","corrected":false},{"one_liner":"Squarespace is a website building and ecommerce platform that enables users to create websites, online stores, and manage inventory and orders via its APIs.","auth_methods":["OAuth2","API key"],"self_serve":"self-serve","gate_reason":"paid plan","api_surface":"REST","api_breadth":"narrow","mcp_exists":true,"buildability":"partial","blocker":"API access (such as Orders and Inventory APIs and Developer Platform) requires higher-tier paid plans like Commerce Advanced or Core plans.","evidence_url":"https://developers.squarespace.com/commerce-apis/authentication-and-permissions","confidence":0.95,"_app_name":"Squarespace","mcp_evidence_url":"https://developers.squarespace.com/mcp/mcp","mcp_notes":"Squarespace provides an official MCP server for domain search and brand-name generation.","category":"Ecommerce","corrected":true},{"one_liner":"Ecwid is an e-commerce platform that allows users to easily add online stores to any website or social media platform.","auth_methods":["OAuth2","API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://docs.ecwid.com/get-started/make-your-first-api-request","confidence":0.95,"_app_name":"Ecwid","mcp_evidence_url":"https://glama.ai/mcp/connectors/io.usefulapi/ecwid","mcp_notes":"Credible MCP servers and integrations exist for Ecwid, provided by platforms such as UsefulAPI, Pipedream, Vinkius, and viaSocket, enabling AI assistants like Claude Desktop and Cursor to manage store inventory, orders, and products.","category":"Ecommerce","corrected":true},{"one_liner":"Gumroad is an e-commerce platform that allows creators to sell products directly to consumers.","auth_methods":["OAuth2"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://app.gumroad.com/api","confidence":1.0,"_app_name":"Gumroad","category":"Ecommerce","corrected":false},{"one_liner":"API for Amazon vendors and sellers to automate orders, inventory, pricing, and fulfillment workflows.","auth_methods":["OAuth2","API key"],"self_serve":"gated","gate_reason":"admin approval","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"partial","blocker":"Requires a Professional selling account and manual developer profile approval from Amazon.","evidence_url":"https://developer-docs.amazon/sp-api/docs/register-as-a-private-developer","confidence":0.95,"_app_name":"Amazon Selling Partner","category":"Ecommerce","corrected":false},{"one_liner":"An all-in-one monetization and marketplace platform for creators and internet businesses to sell digital products, services, and memberships.","auth_methods":["API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"narrow","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://dev-docs.fanbasis.com/","confidence":0.95,"_app_name":"fanbasis","mcp_evidence_url":"https://zapier.com/mcp/fanbasis","mcp_notes":"Zapier provides a FanBasis MCP server integration that allows AI models to connect with the FanBasis platform.","category":"Ecommerce","corrected":true},{"one_liner":"DataForSEO provides comprehensive SEO and SERP data, keyword research, and web scraping APIs for developers.","auth_methods":["HTTP Basic"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://docs.dataforseo.com/v3/auth/","confidence":1.0,"_app_name":"DataForSEO","category":"Data, SEO and Scraping","corrected":false},{"one_liner":"SE Ranking provides an all-in-one SEO and AI search platform offering robust Data and Project APIs for keyword research, backlink analysis, site audits, and AI visibility tracking.","auth_methods":["API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://seranking.com/api/how-to-get-api/","confidence":1.0,"_app_name":"SE Ranking","category":"Data, SEO and Scraping","corrected":false},{"one_liner":"SEO toolset providing backlink analysis, keyword research, rank tracking, and site audits via API and MCP.","auth_methods":["API key","OAuth2"],"self_serve":"self-serve","gate_reason":"paid plan","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://docs.ahrefs.com/","confidence":1.0,"_app_name":"Ahrefs","category":"Data, SEO and Scraping","corrected":false},{"one_liner":"MrScraper is an AI-powered and manual web scraping and data extraction platform with a robust developer API.","auth_methods":["API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://docs.mrscraper.com/docs/api/overview","confidence":1.0,"_app_name":"MrScraper","category":"Data, SEO and Scraping","corrected":false},{"one_liner":"Cloud platform for web scraping and data extraction that lets users run web crawlers, scrapers, and automation tasks.","auth_methods":["API key","OAuth2"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://docs.apify.com/api/v2","confidence":1.0,"_app_name":"Apify","category":"Data, SEO and Scraping","corrected":false},{"one_liner":"Firecrawl is a web scraping, search, and data extraction API that converts websites into clean markdown for AI agents.","auth_methods":["API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://docs.firecrawl.dev/api-reference/v2-introduction","confidence":1.0,"_app_name":"Firecrawl","category":"Data, SEO and Scraping","corrected":false},{"one_liner":"Web data platform providing proxies, web scraping infrastructure, and APIs for collecting public web data.","auth_methods":["API key","Bearer token"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://docs.brightdata.com/api-reference/authentication","confidence":1.0,"_app_name":"Bright Data","category":"Data, SEO and Scraping","corrected":false},{"one_liner":"Hunt down social media accounts by username across social networks","auth_methods":[],"self_serve":"self-serve","gate_reason":"none","api_surface":"none","api_breadth":"narrow","mcp_exists":false,"buildability":"partial","blocker":"No native REST or GraphQL API; can be used as a Python package dependency or via CLI.","evidence_url":"https://github.com/sherlock-project/sherlock/issues/2293","confidence":0.95,"_app_name":"Sherlock","category":"Data, SEO and Scraping","corrected":false},{"one_liner":"Waterfall aggregates 30+ B2B data and enrichment vendors into a single API for contact and company data.","auth_methods":["API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":false,"buildability":"yes","blocker":"","evidence_url":"https://www.waterfall.io/","confidence":1.0,"_app_name":"Waterfall.io","category":"Data, SEO and Scraping","corrected":false},{"one_liner":"Clay is a data enrichment and outbound prospecting platform that combines 50+ data sources to build custom lead lists.","auth_methods":["API key","Webhook"],"self_serve":"gated","gate_reason":"paid plan","api_surface":"REST","api_breadth":"narrow","mcp_exists":false,"buildability":"partial","blocker":"No standalone public developer API for managing tables programmatically; integration relies on inbound webhooks and outbound HTTP API enrichments within paid workspace plans.","evidence_url":"https://university.clay.com/docs/http-api-integration-overview","confidence":0.95,"_app_name":"Clay","category":"Data, SEO and Scraping","corrected":false},{"one_liner":"A web-based hosting service for version control and collaboration using Git, offering a comprehensive REST and GraphQL API.","auth_methods":["OAuth2","Personal access tokens","GitHub App tokens"],"self_serve":"self-serve","gate_reason":"none","api_surface":"both","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://docs.github.com/rest","confidence":1.0,"_app_name":"GitHub","category":"Developer, Infra and Data platforms","corrected":false},{"one_liner":"Frontend cloud platform for deploying and hosting web applications and serverless functions.","auth_methods":["API key","Bearer token","OAuth2"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://vercel.com/docs/rest-api","confidence":1.0,"_app_name":"Vercel","category":"Developer, Infra and Data platforms","corrected":false},{"one_liner":"Netlify is a cloud computing company that offers a web development platform and serverless backend services for web applications and static websites.","auth_methods":["OAuth2","API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":false,"buildability":"yes","blocker":"","evidence_url":"https://docs.netlify.com/api-and-cli-guides/api-guides/get-started-with-api/","confidence":1.0,"_app_name":"Netlify","category":"Developer, Infra and Data platforms","corrected":false},{"one_liner":"Cloudflare provides a cloud platform offering content delivery, DDoS mitigation, internet security, and serverless computing services.","auth_methods":["API key","OAuth2"],"self_serve":"self-serve","gate_reason":"none","api_surface":"both","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://developers.cloudflare.com/api/","confidence":1.0,"_app_name":"Cloudflare","category":"Developer, Infra and Data platforms","corrected":false},{"one_liner":"An open source Firebase alternative providing backend-as-a-service with Postgres database, auth, functions, and storage.","auth_methods":["OAuth2","API key","Personal access token"],"self_serve":"self-serve","gate_reason":"none","api_surface":"both","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://supabase.com/docs/guides/ai-tools/mcp","confidence":1.0,"_app_name":"Supabase","category":"Developer, Infra and Data platforms","corrected":false},{"one_liner":"Graph database management system supporting graph queries, data modeling, and knowledge graphs via drivers, HTTP APIs, and MCP servers.","auth_methods":["API key","Basic auth","Bearer token"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://neo4j.com/docs/http-api/current/","confidence":1.0,"_app_name":"Neo4j","category":"Developer, Infra and Data platforms","corrected":false},{"one_liner":"Cloud-native data platform and data warehouse providing storage, processing, and analytical workloads.","auth_methods":["OAuth2","Key pair (JWT)","API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://docs.snowflake.com/en/developer-guide/snowflake-rest-api/authentication","confidence":0.95,"_app_name":"Snowflake","mcp_evidence_url":"https://github.com/Data-Alchemists/snowflake-mcp","mcp_notes":"Verified existence of Model Context Protocol (MCP) servers/integrations for Snowflake, including community implementations such as Snowflake MCP servers on GitHub.","category":"Developer, Infra and Data platforms","corrected":true},{"one_liner":"MongoDB Atlas is a fully-managed cloud database platform for modern applications, providing automated deployment, scaling, and administration via robust APIs.","auth_methods":["OAuth2","API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://www.mongodb.com/docs/atlas/api/api-authentication/","confidence":1.0,"_app_name":"MongoDB Atlas","category":"Developer, Infra and Data platforms","corrected":false},{"one_liner":"Datadog is a cloud-scale monitoring and security platform for developers, IT operations teams, and business users.","auth_methods":["API key","Application key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://docs.datadoghq.com/api/latest/authentication/","confidence":1.0,"_app_name":"Datadog","category":"Developer, Infra and Data platforms","corrected":false},{"one_liner":"Error tracking and performance monitoring platform that helps developers find, triage, and fix software errors in real-time.","auth_methods":["OAuth2","API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://docs.sentry.io/api/","confidence":1.0,"_app_name":"Sentry","category":"Developer, Infra and Data platforms","corrected":false},{"one_liner":"Connected workspace for notes, docs, wikis, and project management with a developer API.","auth_methods":["OAuth2","API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://developers.notion.com/guides/get-started/overview","confidence":1.0,"_app_name":"Notion","category":"Productivity and Project Management","corrected":false},{"one_liner":"Airtable is a cloud collaboration and database-spreadsheet hybrid platform that allows users to build custom applications and manage workflows.","auth_methods":["OAuth2","Personal access token"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://support.airtable.com/articles/9897799762-using-the-airtable-mcp-server","confidence":1.0,"_app_name":"Airtable","category":"Productivity and Project Management","corrected":false},{"one_liner":"Issue tracking and project management tool for high-performance software teams.","auth_methods":["OAuth2","API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"GraphQL","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://linear.app/developers/graphql","confidence":1.0,"_app_name":"Linear","category":"Productivity and Project Management","corrected":false},{"one_liner":"Issue and project tracking software for agile teams to plan, track, and manage software development.","auth_methods":["OAuth2","API key","Basic Auth"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://developer.atlassian.com/cloud/jira/platform/rest-apis/","confidence":1.0,"_app_name":"Jira","category":"Productivity and Project Management","corrected":false},{"one_liner":"Asana is a work management platform that helps teams organize, track, and manage their projects and tasks.","auth_methods":["OAuth2","API key","OpenID Connect"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://developers.asana.com/docs/authentication","confidence":1.0,"_app_name":"Asana","category":"Productivity and Project Management","corrected":false},{"one_liner":"A work OS and project management platform that lets teams plan, track, and manage projects.","auth_methods":["OAuth2","API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"GraphQL","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://developer.monday.com/api-reference/docs/authentication","confidence":1.0,"_app_name":"Monday.com","category":"Productivity and Project Management","corrected":false},{"one_liner":"ClickUp is a cloud-based project management and productivity platform offering task tracking, document collaboration, and goal management.","auth_methods":["OAuth2","API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://developer.clickup.com/docs/authentication","confidence":1.0,"_app_name":"ClickUp","category":"Productivity and Project Management","corrected":false},{"one_liner":"An all-in-one collaborative doc that blends docs, spreadsheets, and apps.","auth_methods":["API key","OAuth2"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://coda.io/developers","confidence":1.0,"_app_name":"Coda","category":"Productivity and Project Management","corrected":false},{"one_liner":"A cloud-based platform for work management, collaboration, and process automation.","auth_methods":["OAuth2","API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://developers.smartsheet.com/api/smartsheet/introduction","confidence":1.0,"_app_name":"Smartsheet","category":"Productivity and Project Management","corrected":false},{"one_liner":"Harvest is a time tracking and project management software that helps teams track time, manage projects, and invoice clients.","auth_methods":["OAuth2","API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://help.getharvest.com/api-v2/authentication-api/authentication/authentication/","confidence":1.0,"_app_name":"Harvest","category":"Productivity and Project Management","corrected":false},{"one_liner":"Stripe provides payment processing and financial infrastructure APIs for internet businesses.","auth_methods":["API key","OAuth2"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://stripe.com/docs/api","confidence":1.0,"_app_name":"Stripe","mcp_evidence_url":"https://docs.stripe.com/mcp","mcp_notes":"Stripe provides an official Model Context Protocol (MCP) server for Stripe APIs (available via https://mcp.stripe.com or via Stripe's GitHub repositories), allowing MCP clients to interact with Stripe tools.","category":"Finance and Fintech","corrected":true},{"one_liner":"Financial technology platform that builds developer tools to connect applications with users' bank accounts.","auth_methods":["API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://plaid.com/docs/api/","confidence":1.0,"_app_name":"Plaid","category":"Finance and Fintech","corrected":false},{"one_liner":"Cryptocurrency exchange platform providing trading, wallet management, and market data via REST APIs.","auth_methods":["API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://github.com/binance/binance-spot-api-docs","confidence":1.0,"_app_name":"Binance","mcp_evidence_url":"https://github.com/nirholas/Binance-MCP","mcp_notes":"Found credible community-built Model Context Protocol (MCP) servers for Binance, including implementations on GitHub such as nirholas/Binance-MCP and analyticace/binance-mcp-server.","category":"Finance and Fintech","corrected":true},{"one_liner":"Paygent Connect is a payment gateway service in Japan offering SDK modules and APIs for credit cards, convenience store payments, and other payment methods.","auth_methods":["Merchant ID / Connect ID / Password","Client Certificate"],"self_serve":"gated","gate_reason":"contact-sales","api_surface":"REST","api_breadth":"narrow","mcp_exists":false,"buildability":"partial","blocker":"API documentation and modules require merchant contract, NDA agreement, and approval before access.","evidence_url":"https://www.paygent.co.jp/payment_service/connect/module_type/","confidence":0.95,"_app_name":"Paygent Connect","category":"Finance and Fintech","corrected":false},{"one_liner":"FINTRAC-registered FX forensic audit layer and API platform for detecting hidden foreign exchange costs and spread analysis.","auth_methods":["API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"both","api_breadth":"narrow","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://www.ipayx.ai/docs/mcp-server","confidence":1.0,"_app_name":"iPayX","category":"Finance and Fintech","corrected":false},{"one_liner":"Cloud accounting software providing financial management and bookkeeping tools for small businesses.","auth_methods":["OAuth2"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://developer.intuit.com","confidence":1.0,"_app_name":"QuickBooks","category":"Finance and Fintech","corrected":false},{"one_liner":"Cloud-based accounting software for small businesses with an extensive developer API.","auth_methods":["OAuth2"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://developer.xero.com/documentation/api/accounting/overview","confidence":1.0,"_app_name":"Xero","category":"Finance and Fintech","corrected":false},{"one_liner":"Corporate cards, expense management, and business financial services platform for companies.","auth_methods":["API key","OAuth2"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://developer.brex.com/guides/authentication","confidence":1.0,"_app_name":"Brex","category":"Finance and Fintech","corrected":false},{"one_liner":"Ramp is a corporate card and spend management platform that automates expense reporting, bill payments, and accounting.","auth_methods":["OAuth2","API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://docs.ramp.com/developer/get-started","confidence":0.95,"_app_name":"Ramp","mcp_evidence_url":"https://github.com/ramp-public/ramp_mcp","mcp_notes":"Ramp provides an official MCP server (ramp-public/ramp-mcp) as well as a developer MCP server via their documentation and engineering portal.","category":"Finance and Fintech","corrected":true},{"one_liner":"PitchBook provides private and public market data covering companies, investors, funds, investments, and exits.","auth_methods":["API key"],"self_serve":"gated","gate_reason":"contact-sales","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"partial","blocker":"Requires contacting sales and entering a paid enterprise contract for Direct Data / API access.","evidence_url":"https://pitchbook.com/products/direct-access-data/api","confidence":0.95,"_app_name":"PitchBook","mcp_evidence_url":"https://ciofirst.com/pitchbook-partners-with-perplexity-to-deliver-ai-market-intelligence/","mcp_notes":"PitchBook provides official MCP support via a dedicated Model Context Protocol server (https://premium.mcp.pitchbook.com/mcp) and an integration with Perplexity for AI-powered private market intelligence.","category":"Finance and Fintech","corrected":true},{"one_liner":"AI-powered research and note-taking assistant that creates personalized notebooks from user documents.","auth_methods":["OAuth2"],"self_serve":"gated","gate_reason":"paid plan","api_surface":"REST","api_breadth":"narrow","mcp_exists":false,"buildability":"partial","blocker":"Official APIs are restricted to Gemini Notebook Enterprise on Google Cloud; consumer NotebookLM lacks a public developer API.","evidence_url":"https://docs.cloud.google.com/gemini/enterprise/notebooklm-enterprise/docs/api-notebooks","confidence":0.95,"_app_name":"NotebookLM","category":"AI, Research and Media-native","corrected":false},{"one_liner":"AI-powered meeting assistant that records audio, writes notes, generates summaries, and extracts action items.","auth_methods":["API key","OAuth2"],"self_serve":"gated","gate_reason":"paid plan","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://help.otter.ai/hc/en-us/articles/36130822688279-Otter-ai-Public-API","confidence":1.0,"_app_name":"Otter AI","category":"AI, Research and Media-native","corrected":false},{"one_liner":"AI-powered meeting assistant that records, transcribes, and summarizes video calls.","auth_methods":["API key","OAuth2"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://developers.fathom.ai/api-overview","confidence":1.0,"_app_name":"Fathom","category":"AI, Research and Media-native","corrected":false},{"one_liner":"An AI-powered search engine that extracts and synthesizes findings directly from scientific research papers.","auth_methods":["API key"],"self_serve":"gated","gate_reason":"contact-sales","api_surface":"REST","api_breadth":"narrow","mcp_exists":true,"buildability":"partial","blocker":"API is available by application only with custom quotes and paid pricing tiers.","evidence_url":"https://consensus.app/home/api/","confidence":0.95,"_app_name":"Consensus","mcp_evidence_url":"https://docs.consensus.app/consensus-mcp","mcp_notes":"Consensus provides an official Model Context Protocol (MCP) server that enables AI assistants like Claude and ChatGPT to search and retrieve information from over 220 million peer-reviewed research papers.","category":"AI, Research and Media-native","corrected":true},{"one_liner":"An agentic document parsing and data extraction platform that converts complex documents into structured data.","auth_methods":["API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://docs.reducto.ai/mcp-server","confidence":1.0,"_app_name":"Reducto","category":"AI, Research and Media-native","corrected":false},{"one_liner":"Devin is an AI software engineer agent that can autonomously write, test, debug, and deploy code.","auth_methods":["API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://docs.devin.ai/api-reference/overview","confidence":1.0,"_app_name":"Devin","category":"AI, Research and Media-native","corrected":false},{"one_liner":"Higgsfield AI is a media-native AI platform providing generative models, a CLI, and a Python client for image, video, and character generation.","auth_methods":["API key","OAuth2"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://higgsfield.ai/cli","confidence":0.95,"_app_name":"higgsfield","category":"AI, Research and Media-native","corrected":false},{"one_liner":"Command-line interface to render Mermaid graphs to images and PDFs","auth_methods":[],"self_serve":"self-serve","gate_reason":"none","api_surface":"none","api_breadth":"narrow","mcp_exists":false,"buildability":"yes","blocker":"","evidence_url":"https://github.com/mermaid-js/mermaid-cli","confidence":1.0,"_app_name":"Mermaid CLI","category":"AI, Research and Media-native","corrected":false},{"one_liner":"A simple and reliable REST API and MCP server for extracting YouTube video transcripts, search, channels, and playlists programmatically.","auth_methods":["API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://transcriptapi.com/docs/api/","confidence":1.0,"_app_name":"YouTube Transcript","category":"AI, Research and Media-native","corrected":false},{"one_liner":"Grain is an AI-powered meeting notetaker and workspace platform that records, transcribes, and summarizes meetings.","auth_methods":["OAuth2","API key"],"self_serve":"self-serve","gate_reason":"none","api_surface":"REST","api_breadth":"broad","mcp_exists":true,"buildability":"yes","blocker":"","evidence_url":"https://developers.grain.com/","confidence":1.0,"_app_name":"Grain","category":"AI, Research and Media-native","corrected":false}]
+</script>
 <script>
-function filterRows(){
- const q=document.getElementById('search').value.toLowerCase();
- const cat=document.getElementById('cat').value;
- const build=document.getElementById('build').value;
- const mcp=document.getElementById('mcp').value;
- document.querySelectorAll('#matrix tbody tr').forEach(tr=>{
-   const t=tr.innerText.toLowerCase();
-   const cells=tr.children;
-   if(cells.length<8){tr.style.display='none';return;}
-   const okQ=!q||t.includes(q);
-   const okCat=!cat||cells[1].innerText===cat;
-   const okBuild=!build||cells[5].innerText===build;
-   const okMcp=!mcp||cells[3].innerText===mcp;
-   tr.style.display=(okQ&&okCat&&okBuild&&okMcp)?'':'none';
- });
+const apps = JSON.parse(document.getElementById('app-data').textContent);
+const correctedSet = new Set(apps.filter(a => a.corrected).map(a => a._app_name));
+
+function evidenceHost(url){
+  try{ return new URL(url).hostname.replace('www.',''); }catch(e){ return url; }
 }
+
+function renderLedger(){
+  const rows = apps.filter(a => a.corrected).sort((a,b)=> a._app_name.localeCompare(b._app_name));
+  const el = document.getElementById('ledger-rows');
+  el.innerHTML = rows.map(a => `
+    <div class="ledger-row">
+      <div class="ledger-app">${a._app_name}</div>
+      <div class="ledger-diff">
+        <span class="diff-old">mcp_exists: false</span>
+        <span class="diff-arrow">→</span>
+        <span class="diff-new">mcp_exists: true</span>
+        ${a.mcp_evidence_url ? `<a class="ev-link" href="${a.mcp_evidence_url}" target="_blank" rel="noopener" style="color:var(--confirm);">${evidenceHost(a.mcp_evidence_url)}</a>` : ''}
+      </div>
+      <div class="ledger-cause">${a.mcp_notes ? a.mcp_notes.slice(0,90) + (a.mcp_notes.length>90?'…':'') : 'confirmed via GitHub-augmented rerun'}</div>
+    </div>
+  `).join('');
+}
+
+function populateCategories(){
+  const cats = [...new Set(apps.map(a => a.category))].sort();
+  const sel = document.getElementById('category-select');
+  cats.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c; opt.textContent = c;
+    sel.appendChild(opt);
+  });
+}
+
+function renderTable(filter, query, category){
+  const body = document.getElementById('app-table-body');
+  const q = (query||'').toLowerCase().trim();
+  let rows = apps.filter(a => {
+    if(q && !(a._app_name.toLowerCase().includes(q) || (a.evidence_url||'').toLowerCase().includes(q) || (a.one_liner||'').toLowerCase().includes(q))) return false;
+    if(category && a.category !== category) return false;
+    if(filter==='mcp') return a.mcp_exists;
+    if(filter==='nomcp') return !a.mcp_exists;
+    if(filter==='gated') return a.self_serve === 'gated';
+    if(filter==='corrected') return a.corrected;
+    return true;
+  });
+  rows.sort((a,b)=> a._app_name.localeCompare(b._app_name));
+  document.getElementById('row-count').textContent = rows.length + ' of ' + apps.length + ' apps shown';
+  body.innerHTML = rows.map(a => {
+    const buildCell = a.buildability === 'yes'
+      ? 'yes'
+      : `${a.buildability}${a.blocker ? ' — ' + a.blocker : ''}`;
+    const evLinks = [`<a class="ev-link" href="${a.evidence_url}" target="_blank" rel="noopener">${evidenceHost(a.evidence_url)}</a>`];
+    if(a.mcp_evidence_url){
+      evLinks.push(`<a class="ev-link" href="${a.mcp_evidence_url}" target="_blank" rel="noopener" style="color:var(--confirm);">mcp: ${evidenceHost(a.mcp_evidence_url)}</a>`);
+    }
+    return `
+    <tr>
+      <td><span class="app-name" title="${(a.one_liner||'').replace(/"/g,'&quot;')}">${a._app_name}</span>${a.corrected ? '<span class="corrected-mark">corrected</span>' : ''}<div style="font-size:11px;color:var(--ink-soft);margin-top:3px;max-width:220px;">${a.one_liner||''}</div></td>
+      <td style="font-size:12px;color:var(--ink-soft);">${a.category||'—'}</td>
+      <td>${(a.auth_methods||[]).join(', ') || '—'}</td>
+      <td><span class="gate-badge ${a.self_serve==='self-serve'?'self':'gated'}">${a.self_serve}${a.gate_reason && a.gate_reason!=='none' ? ' · '+a.gate_reason : ''}</span></td>
+      <td>${a.api_surface}${a.api_breadth ? ' · '+a.api_breadth : ''}</td>
+      <td><span class="mcp-badge ${a.mcp_exists?'yes':'no'}">${a.mcp_exists ? 'yes' : 'no'}</span></td>
+      <td style="font-size:12px;">${buildCell}</td>
+      <td style="display:flex;flex-direction:column;gap:4px;">${evLinks.join('')}</td>
+    </tr>
+  `;
+  }).join('');
+}
+
+let activeFilter = 'all';
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    activeFilter = chip.dataset.filter;
+    renderTable(activeFilter, document.getElementById('search').value, document.getElementById('category-select').value);
+  });
+});
+document.getElementById('search').addEventListener('input', (e) => {
+  renderTable(activeFilter, e.target.value, document.getElementById('category-select').value);
+});
+document.getElementById('category-select').addEventListener('change', (e) => {
+  renderTable(activeFilter, document.getElementById('search').value, e.target.value);
+});
+
+populateCategories();
+renderLedger();
+renderTable('all','','');
 </script>
 </body>
 </html>
